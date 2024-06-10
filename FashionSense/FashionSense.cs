@@ -513,11 +513,26 @@ namespace FashionSense
             }
         }
 
+        private static DirectoryInfo GetContentPackDirectory(IContentPack contentPack, string name)
+        {
+            var contentPackDirectory = new DirectoryInfo(contentPack.DirectoryPath);
+
+            foreach (var directory in contentPackDirectory.GetDirectories())
+            {
+                if (directory.Name.ToLower() == name.ToLower())
+                {
+                    return directory;
+                }
+            }
+
+            return new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, name));
+        }
+
         private void AddHairContentPacks(IContentPack contentPack)
         {
             try
             {
-                var directoryPath = new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, "Hairs"));
+                var directoryPath = GetContentPackDirectory(contentPack, "Hairs");
                 if (!directoryPath.Exists)
                 {
                     Monitor.Log($"No Hairs folder found for the content pack {contentPack.Manifest.Name}", LogLevel.Trace);
@@ -633,7 +648,7 @@ namespace FashionSense
         {
             try
             {
-                var directoryPath = new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, "Accessories"));
+                var directoryPath = GetContentPackDirectory(contentPack, "Accessories");
                 if (!directoryPath.Exists)
                 {
                     Monitor.Log($"No Accessories folder found for the content pack {contentPack.Manifest.Name}", LogLevel.Trace);
@@ -749,7 +764,7 @@ namespace FashionSense
         {
             try
             {
-                var directoryPath = new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, "Hats"));
+                var directoryPath = GetContentPackDirectory(contentPack, "Hats");
                 if (!directoryPath.Exists)
                 {
                     Monitor.Log($"No Hats folder found for the content pack {contentPack.Manifest.Name}", LogLevel.Trace);
@@ -865,7 +880,7 @@ namespace FashionSense
         {
             try
             {
-                var directoryPath = new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, "Shirts"));
+                var directoryPath = GetContentPackDirectory(contentPack, "Shirts");
                 if (!directoryPath.Exists)
                 {
                     Monitor.Log($"No Shirts folder found for the content pack {contentPack.Manifest.Name}", LogLevel.Trace);
@@ -981,7 +996,7 @@ namespace FashionSense
         {
             try
             {
-                var directoryPath = new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, "Pants"));
+                var directoryPath = GetContentPackDirectory(contentPack, "Pants");
                 if (!directoryPath.Exists)
                 {
                     Monitor.Log($"No Pants folder found for the content pack {contentPack.Manifest.Name}", LogLevel.Trace);
@@ -1097,7 +1112,7 @@ namespace FashionSense
         {
             try
             {
-                var directoryPath = new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, "Sleeves"));
+                var directoryPath = GetContentPackDirectory(contentPack, "Sleeves");
                 if (!directoryPath.Exists)
                 {
                     Monitor.Log($"No Sleeves folder found for the content pack {contentPack.Manifest.Name}", LogLevel.Trace);
@@ -1213,7 +1228,7 @@ namespace FashionSense
         {
             try
             {
-                var directoryPath = new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, "Shoes"));
+                var directoryPath = GetContentPackDirectory(contentPack, "Shoes");
                 if (!directoryPath.Exists)
                 {
                     Monitor.Log($"No Shoes folder found for the content pack {contentPack.Manifest.Name}", LogLevel.Trace);
@@ -1329,7 +1344,7 @@ namespace FashionSense
         {
             try
             {
-                var directoryPath = new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, "Bodies"));
+                var directoryPath = GetContentPackDirectory(contentPack, "Bodies");
                 if (!directoryPath.Exists)
                 {
                     Monitor.Log($"No Bodies folder found for the content pack {contentPack.Manifest.Name}", LogLevel.Trace);
