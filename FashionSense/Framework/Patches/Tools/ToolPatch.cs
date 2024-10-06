@@ -93,14 +93,17 @@ namespace FashionSense.Framework.Patches.Tools
                         return CancelUsing(who);
                     }
 
-                    var targetFarmer = who;
                     if (Game1.GetKeyboardState().IsKeyDown(Keys.LeftShift) || Game1.GetKeyboardState().IsKeyDown(Keys.RightShift))
                     {
-                        targetFarmer = mannequinFarmer;
-                        FashionSense.outfitManager.ClearOutfit(targetFarmer);
+                        mannequin.modData.Remove(ModDataKeys.MANNEQUIN_OUTFIT_DATA);
+                        FashionSense.outfitManager.ClearOutfit(mannequinFarmer);
+                        _helper.Reflection.GetField<Farmer>(mannequin, "renderCache").SetValue(null);
                     }
-                    AttemptCopyAppearanceToMannequin(mannequin, targetFarmer);
-                    MannequinPatch.CopyModDataFromMannequinToFarmer(mannequin, mannequinFarmer);
+                    else
+                    {
+                        AttemptCopyAppearanceToMannequin(mannequin, who);
+                        MannequinPatch.CopyModDataFromMannequinToFarmer(mannequin, mannequinFarmer);
+                    }
 
                     return CancelUsing(who);
                 }
