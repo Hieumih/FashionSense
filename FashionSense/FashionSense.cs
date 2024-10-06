@@ -130,6 +130,7 @@ namespace FashionSense
                 new ItemPatch(monitor, modHelper).Apply(harmony);
                 new ObjectPatch(monitor, modHelper).Apply(harmony);
                 new ColoredObjectPatch(monitor, modHelper).Apply(harmony);
+                new MannequinPatch(monitor, modHelper).Apply(harmony);
 
                 // Apply clothing related patches
                 new ClothingPatch(monitor, modHelper).Apply(harmony);

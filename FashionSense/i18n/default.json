@@ -11,6 +11,9 @@
   "tools.description.hand_mirror": "Allows you to change your appearance into a more lively one.",
 
   // Messages
+  "messages.warning.mannequin_copied_appearance": "Copied outfit from mannequin!",
+  "messages.warning.mannequin_occupied": "The mannequin has clothing on it. Remove them to set the Fashion Sense appearance.",
+  "messages.warning.mannequin_using_fashion_sense": "The mannequin is using a Fashion Sense appearance. Shift click with the Hand Mirror to remove it.",
   "messages.warning.requires_hand_mirror": "No Hand Mirror in inventory! Disable the RequireHandMirrorInInventory config setting to ignore this requirement.",
   "messages.warning.no_content_packs": "You don't have any Fashion Sense content packs installed!",
 
