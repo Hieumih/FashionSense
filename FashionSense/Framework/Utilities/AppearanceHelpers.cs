@@ -483,7 +483,7 @@ namespace FashionSense.Framework.Utilities
             // Handle any missing key value
             if (animationData.LightId is null)
             {
-                animationData.LightId = GenerateLightId(model, indexOffset);
+                animationData.LightId = GenerateLightId(indexOffset);
 
                 if (animationData.LightId is null)
                 {
@@ -494,35 +494,34 @@ namespace FashionSense.Framework.Utilities
             var lightModel = animationModel.Light;
             if (lightModel is null)
             {
-                if (Game1.currentLocation.sharedLights.ContainsKey(animationData.LightId))
+                if (Game1.currentLocation.sharedLights.ContainsKey(animationData.LightId.Value))
                 {
-                    Game1.currentLocation.sharedLights.Remove(animationData.LightId);
+                    Game1.currentLocation.sharedLights.Remove(animationData.LightId.Value);
                 }
                 return;
             }
 
             // Handle updating the position and other values of the light
-            if (!Game1.currentLocation.sharedLights.ContainsKey(animationData.LightId))
+            if (!Game1.currentLocation.sharedLights.ContainsKey(animationData.LightId.Value))
             {
-                Game1.currentLocation.sharedLights[animationData.LightId] = new LightSource(animationData.LightId, lightModel.GetTextureSource(), who.Position - new Vector2(lightModel.Position.X, lightModel.Position.Y), lightModel.GetRadius(recalculateLight), lightModel.GetColor(), LightSource.LightContext.None);
+                Game1.currentLocation.sharedLights[animationData.LightId.Value] = new LightSource(lightModel.GetTextureSource(), who.Position - new Vector2(lightModel.Position.X, lightModel.Position.Y), lightModel.GetRadius(recalculateLight), lightModel.GetColor(), LightSource.LightContext.None);
             }
             else
             {
-                Game1.currentLocation.sharedLights[animationData.LightId].position.Value = who.Position - new Vector2(lightModel.Position.X, lightModel.Position.Y);
-                Game1.currentLocation.sharedLights[animationData.LightId].radius.Value = lightModel.GetRadius(recalculateLight);
-                Game1.currentLocation.sharedLights[animationData.LightId].color.Value = lightModel.GetColor();
+                Game1.currentLocation.sharedLights[animationData.LightId.Value].position.Value = who.Position - new Vector2(lightModel.Position.X, lightModel.Position.Y);
+                Game1.currentLocation.sharedLights[animationData.LightId.Value].radius.Value = lightModel.GetRadius(recalculateLight);
+                Game1.currentLocation.sharedLights[animationData.LightId.Value].color.Value = lightModel.GetColor();
             }
         }
 
-        public static string GenerateLightId(AppearanceModel model, int offset)
+        public static int? GenerateLightId(int offset)
         {
-            var offsetBase = offset * 5000;
+            var baseKeyId = -1 * offset * 5000;
             for (int x = 0; x < 100; x++)
             {
-                var lightId = $"{model.Pack.Id}_{offsetBase + x}";
-                if (!Game1.currentLocation.sharedLights.ContainsKey(lightId))
+                if (!Game1.currentLocation.sharedLights.ContainsKey(baseKeyId + x))
                 {
-                    return lightId;
+                    return baseKeyId + x;
                 }
             }
 
