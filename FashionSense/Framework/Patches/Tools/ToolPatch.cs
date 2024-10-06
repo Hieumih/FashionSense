@@ -133,7 +133,12 @@ namespace FashionSense.Framework.Patches.Tools
 
         private static void AttemptCopyAppearanceToMannequin(Mannequin mannequin, Farmer who)
         {
-            mannequin.modData[ModDataKeys.MANNEQUIN_OUTFIT_DATA] = JsonConvert.SerializeObject(new Outfit(who, "Mannequin Outfit"));
+            var outfit = new Outfit(who, "Mannequin Outfit");
+
+            // Exclude body appearances to prevent display issues
+            outfit.BodyId = "None";
+
+            mannequin.modData[ModDataKeys.MANNEQUIN_OUTFIT_DATA] = JsonConvert.SerializeObject(outfit);
         }
 
         private static bool UseHandMirror(GameLocation location, int x, int y, Farmer who)

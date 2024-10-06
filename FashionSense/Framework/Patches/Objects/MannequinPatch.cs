@@ -141,6 +141,11 @@ namespace FashionSense.Framework.Patches.Objects
             }
 
             Outfit outfit = JsonConvert.DeserializeObject<Outfit>(mannequin.modData[ModDataKeys.MANNEQUIN_OUTFIT_DATA]);
+            if (farmer.modData.ContainsKey(ModDataKeys.CUSTOM_BODY_ID))
+            {
+                outfit.BodyId = farmer.modData[ModDataKeys.CUSTOM_BODY_ID];
+            }
+
             FashionSense.outfitManager.SetOutfit(farmer, outfit);
         }
 
