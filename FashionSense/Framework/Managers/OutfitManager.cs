@@ -307,7 +307,7 @@ namespace FashionSense.Framework.Managers
                 }
             }
 
-            FashionSense.SetSpriteDirty();
+            FashionSense.SetSpriteDirty(who);
 
             // Attempt to reset any overridden textures
             FashionSense.ResetTextureIfNecessary(who.modData[ModDataKeys.CUSTOM_HAIR_ID]);

@@ -216,7 +216,7 @@ namespace FashionSense.Framework.UI
                         case HandMirrorMenu.ACCESSORY_FILTER_BUTTON:
                             FashionSense.accessoryManager.AddAccessory(fakeFarmers[i], targetPack.Id, _callbackMenu.GetAccessoryIndex(), preserveColor: true);
                             FashionSense.ResetAnimationModDataFields(fakeFarmers[i], 0, AnimationModel.Type.Idle, fakeFarmers[i].FacingDirection);
-                            FashionSense.SetSpriteDirty();
+                            FashionSense.SetSpriteDirty(fakeFarmers[i]);
                             continue;
                         case HandMirrorMenu.HAT_FILTER_BUTTON:
                             modDataKey = ModDataKeys.CUSTOM_HAT_ID;
@@ -245,7 +245,7 @@ namespace FashionSense.Framework.UI
 
                     fakeFarmers[i].modData[modDataKey] = targetPack.Id;
                     FashionSense.ResetAnimationModDataFields(fakeFarmers[i], 0, AnimationModel.Type.Idle, fakeFarmers[i].FacingDirection);
-                    FashionSense.SetSpriteDirty();
+                    FashionSense.SetSpriteDirty(fakeFarmers[i]);
                 }
             }
         }
@@ -358,7 +358,7 @@ namespace FashionSense.Framework.UI
                     FashionSense.accessoryManager.CopyAccessories(fakeFarmers[i], _displayFarmer);
 
                     FashionSense.ResetAnimationModDataFields(_displayFarmer, 0, AnimationModel.Type.Idle, _displayFarmer.FacingDirection);
-                    FashionSense.SetSpriteDirty();
+                    FashionSense.SetSpriteDirty(_displayFarmer);
                     _callbackMenu.Reset();
 
                     base.exitThisMenu();

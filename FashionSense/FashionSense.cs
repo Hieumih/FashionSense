@@ -409,7 +409,7 @@ namespace FashionSense
             LoadCachedAccessories(Game1.player);
 
             // Set sprite to dirty in order to refresh sleeves and other tied-in appearances
-            SetSpriteDirty();
+            SetSpriteDirty(Game1.player);
 
             // Load our Data/PeacefulEnd/FashionSense/AppearanceData
             _ = Helper.GameContent.Load<Dictionary<string, AppearanceContentPack>>("Data/PeacefulEnd/FashionSense/AppearanceData");
@@ -599,7 +599,7 @@ namespace FashionSense
 
             if (Context.IsWorldReady)
             {
-                SetSpriteDirty();
+                SetSpriteDirty(Game1.player);
             }
         }
 
@@ -1605,15 +1605,15 @@ namespace FashionSense
             colorManager.SetColor(Game1.player, actualColorKey, Game1.player.modData[actualColorKey]);
         }
 
-        internal static void SetSpriteDirty(bool skipColorMaskRefresh = false)
+        internal static void SetSpriteDirty(Farmer who, bool skipColorMaskRefresh = false)
         {
-            var spriteDirty = modHelper.Reflection.GetField<bool>(Game1.player.FarmerRenderer, "_spriteDirty");
+            var spriteDirty = modHelper.Reflection.GetField<bool>(who.FarmerRenderer, "_spriteDirty");
             spriteDirty.SetValue(true);
-            var shirtDirty = modHelper.Reflection.GetField<bool>(Game1.player.FarmerRenderer, "_shirtDirty");
+            var shirtDirty = modHelper.Reflection.GetField<bool>(who.FarmerRenderer, "_shirtDirty");
             shirtDirty.SetValue(true);
-            var shoeDirty = modHelper.Reflection.GetField<bool>(Game1.player.FarmerRenderer, "_shoesDirty");
+            var shoeDirty = modHelper.Reflection.GetField<bool>(who.FarmerRenderer, "_shoesDirty");
             shoeDirty.SetValue(true);
-            var skinDirty = modHelper.Reflection.GetField<bool>(Game1.player.FarmerRenderer, "_skinDirty");
+            var skinDirty = modHelper.Reflection.GetField<bool>(who.FarmerRenderer, "_skinDirty");
             skinDirty.SetValue(true);
 
             if (skipColorMaskRefresh is false)

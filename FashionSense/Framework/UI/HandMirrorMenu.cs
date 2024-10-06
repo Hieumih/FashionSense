@@ -705,7 +705,7 @@ namespace FashionSense.Framework.UI
                     break;
                 case SHIRT_FILTER_BUTTON:
                     AppearanceHelpers.SetAppearanceColorForLayer(GetActiveModel(), Game1.player, color, maskLayerIndex: currentColorMaskLayerIndex);
-                    FashionSense.SetSpriteDirty(skipColorMaskRefresh: true);
+                    FashionSense.SetSpriteDirty(Game1.player, skipColorMaskRefresh: true);
                     break;
                 case PANTS_FILTER_BUTTON:
                     AppearanceHelpers.SetAppearanceColorForLayer(GetActiveModel(), Game1.player, color, maskLayerIndex: currentColorMaskLayerIndex);
@@ -717,14 +717,14 @@ namespace FashionSense.Framework.UI
                     AppearanceHelpers.SetAppearanceColorForLayer(GetActiveModel(), Game1.player, color, maskLayerIndex: currentColorMaskLayerIndex);
                     if (Game1.player.modData.ContainsKey(ModDataKeys.CUSTOM_SHOES_ID) && Game1.player.modData[ModDataKeys.CUSTOM_SHOES_ID] == ModDataKeys.INTERNAL_COLOR_OVERRIDE_SHOE_ID)
                     {
-                        FashionSense.SetSpriteDirty(skipColorMaskRefresh: true);
+                        FashionSense.SetSpriteDirty(Game1.player, skipColorMaskRefresh: true);
                         FashionSense.messageManager.SendVanillaBootColorChangeMessage(_displayFarmer);
                     }
                     break;
                 case BODY_FILTER_BUTTON:
                     AppearanceHelpers.SetAppearanceColorForLayer(GetActiveModel(), Game1.player, color, maskLayerIndex: currentColorMaskLayerIndex);
 
-                    FashionSense.SetSpriteDirty(skipColorMaskRefresh: false);
+                    FashionSense.SetSpriteDirty(Game1.player, skipColorMaskRefresh: false);
                     FashionSense.messageManager.SendVanillaBootColorChangeMessage(_displayFarmer);
                     break;
             }
@@ -811,7 +811,7 @@ namespace FashionSense.Framework.UI
             FashionSense.ResetAnimationModDataFields(Game1.player, 0, AnimationModel.Type.Idle, Game1.player.FacingDirection);
             Game1.playSound("grassyStep");
 
-            FashionSense.SetSpriteDirty();
+            FashionSense.SetSpriteDirty(Game1.player);
             FashionSense.ResetTextureIfNecessary(currentAppearance);
         }
 
@@ -834,7 +834,7 @@ namespace FashionSense.Framework.UI
                     Game1.playSound("pickUpItem");
 
                     Reset();
-                    FashionSense.SetSpriteDirty();
+                    FashionSense.SetSpriteDirty(Game1.player);
                     break;
                 case LIMIT_TO_ACCCESSORIES:
                     if (Game1.player.modData.ContainsKey(ModDataKeys.UI_HAND_MIRROR_FILTER_BUTTON) && Game1.player.modData[ModDataKeys.UI_HAND_MIRROR_FILTER_BUTTON] == ACCESSORY_FILTER_BUTTON)
@@ -1052,7 +1052,7 @@ namespace FashionSense.Framework.UI
                             break;
                         case ACCESSORY_FILTER_BUTTON:
                             FashionSense.accessoryManager.RemoveAccessory(Game1.player, currentAccessorySlot);
-                            FashionSense.SetSpriteDirty();
+                            FashionSense.SetSpriteDirty(Game1.player);
                             return;
                         case HAT_FILTER_BUTTON:
                             modDataKey = ModDataKeys.CUSTOM_HAT_ID;
@@ -1077,7 +1077,7 @@ namespace FashionSense.Framework.UI
                     Game1.player.modData[modDataKey] = "None";
                 }
 
-                FashionSense.SetSpriteDirty();
+                FashionSense.SetSpriteDirty(Game1.player);
             }
 
             if (randomButton.containsPoint(x, y))
@@ -1123,7 +1123,7 @@ namespace FashionSense.Framework.UI
                 if (randomContentPack is not null)
                 {
                     Game1.player.modData[modDataKey] = randomContentPack.Id;
-                    FashionSense.SetSpriteDirty();
+                    FashionSense.SetSpriteDirty(Game1.player);
                     FashionSense.ResetTextureIfNecessary(randomContentPack.Id);
                 }
             }
