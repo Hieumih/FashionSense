@@ -52,6 +52,11 @@ namespace FashionSense.Framework.Patches.Objects
 
         private static void UpdateWhenCurrentLocationPostfix(Mannequin __instance, Farmer ___renderCache, GameTime time)
         {
+            if (FashionSense.modConfig.AllowMannequinAnimations is false)
+            {
+                return;
+            }
+
             Farmer farmer = ___renderCache;
             if (farmer is null)
             {

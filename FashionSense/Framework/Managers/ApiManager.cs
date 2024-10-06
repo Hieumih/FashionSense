@@ -54,8 +54,10 @@ namespace FashionSense.Framework.Managers
 
             _genericModConfigMenuApi.AddSectionTitle(modManifest, () => helper.Translation.Get("config.general.title"));
 
-            _genericModConfigMenuApi.AddBoolOption(modManifest, () => FashionSense.modConfig.RequireHandMirrorInInventory, value => FashionSense.modConfig.RequireHandMirrorInInventory = value, () => helper.Translation.Get("config.general.require_hand_mirror.name"), () => helper.Translation.Get("config.general.require_hand_mirror.description")); 
+            _genericModConfigMenuApi.AddBoolOption(modManifest, () => FashionSense.modConfig.RequireHandMirrorInInventory, value => FashionSense.modConfig.RequireHandMirrorInInventory = value, () => helper.Translation.Get("config.general.require_hand_mirror.name"), () => helper.Translation.Get("config.general.require_hand_mirror.description"));
             _genericModConfigMenuApi.AddKeybind(modManifest, () => FashionSense.modConfig.QuickMenuKey, value => FashionSense.modConfig.QuickMenuKey = value, () => helper.Translation.Get("config.general.shortcut_key.name"), () => helper.Translation.Get("config.general.shortcut_key.description"));
+
+            _genericModConfigMenuApi.AddBoolOption(modManifest, () => FashionSense.modConfig.AllowMannequinAnimations, value => FashionSense.modConfig.AllowMannequinAnimations = value, () => helper.Translation.Get("config.general.allow_mannequin_animations.name"), () => helper.Translation.Get("config.general.allow_mannequin_animations.description"));
         }
 
         private static void ResetConfig()

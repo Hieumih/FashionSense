@@ -2,9 +2,11 @@
   // Config
   "config.general.title": "Fashion Sense",
   "config.general.require_hand_mirror.name": "Require Hand Mirror",
-  "config.general.require_hand_mirror.description": "When this is enabled, the Hand Mirror shortcut requires the Hand Mirror to be in the player's inventory.",
+  "config.general.require_hand_mirror.description": "When enabled, the Hand Mirror shortcut requires the Hand Mirror to be in the player's inventory.",
   "config.general.shortcut_key.name": "Hand Mirror Shortcut Key",
   "config.general.shortcut_key.description": "When this key is pressed, the Hand Mirror menu will appear.",
+  "config.general.allow_mannequin_animations.name": "Allow Mannequin Animations",
+  "config.general.allow_mannequin_animations.description": "When enabled, mannequins with Fashion Sense appearances will play their animations.",
 
   // Tools
   "tools.name.hand_mirror": "Hand Mirror",
