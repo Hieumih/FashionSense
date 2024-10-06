@@ -1,8 +1,10 @@
-﻿using FashionSense.Framework.Patches.Renderer;
+﻿using FashionSense.Framework.Models;
+using FashionSense.Framework.Patches.Renderer;
 using FashionSense.Framework.Utilities;
 using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Characters;
@@ -108,13 +110,15 @@ namespace FashionSense.Framework.Patches.Objects
             CopyModDataFromMannequinToFarmer(__instance, __result);
         }
 
-        internal static void CopyModDataFromMannequinToFarmer(Mannequin mannequin, Farmer fakeFarmer)
+        internal static void CopyModDataFromMannequinToFarmer(Mannequin mannequin, Farmer farmer)
         {
-            foreach (var key in mannequin.modData.Keys)
+            if (mannequin.modData.ContainsKey(ModDataKeys.MANNEQUIN_OUTFIT_DATA) is false)
             {
-                fakeFarmer.modData[key] = mannequin.modData[key];
+                return;
             }
-            FashionSense.SetSpriteDirty();
+
+            Outfit outfit = JsonConvert.DeserializeObject<Outfit>(mannequin.modData[ModDataKeys.MANNEQUIN_OUTFIT_DATA]);
+            FashionSense.outfitManager.SetOutfit(farmer, outfit);
         }
 
         internal static bool CanEquipFashionSenseAppearance(Mannequin mannequin)

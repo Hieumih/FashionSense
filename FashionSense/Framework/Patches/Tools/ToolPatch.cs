@@ -1,10 +1,12 @@
-﻿using FashionSense.Framework.Patches.Objects;
+﻿using FashionSense.Framework.Models;
+using FashionSense.Framework.Patches.Objects;
 using FashionSense.Framework.UI;
 using FashionSense.Framework.Utilities;
 using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Newtonsoft.Json;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Objects;
@@ -129,22 +131,9 @@ namespace FashionSense.Framework.Patches.Tools
             return null;
         }
 
-        private static bool AttemptCopyAppearanceToMannequin(Mannequin mannequin, Farmer who)
+        private static void AttemptCopyAppearanceToMannequin(Mannequin mannequin, Farmer who)
         {
-            foreach (var key in mannequin.modData.Keys)
-            {
-                if (key.Contains("FashionSense"))
-                {
-                    mannequin.modData.Remove(key);
-                }
-            }
-
-            foreach (var key in who.modData.Keys)
-            {
-                mannequin.modData[key] = who.modData[key];
-            }
-
-            return true;
+            mannequin.modData[ModDataKeys.MANNEQUIN_OUTFIT_DATA] = JsonConvert.SerializeObject(new Outfit(who, "Mannequin Outfit"));
         }
 
         private static bool UseHandMirror(GameLocation location, int x, int y, Farmer who)
