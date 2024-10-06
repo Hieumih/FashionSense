@@ -205,7 +205,7 @@ namespace FashionSense
                 // Update elapsed durations for the player
                 foreach (var farmer in Game1.getAllFarmers())
                 {
-                    UpdateElapsedDuration(farmer);
+                    FashionSense.UpdateElapsedDuration(farmer);
 
                     // Update movement trackers
                     conditionData.Update(farmer, Game1.currentGameTime);
@@ -217,7 +217,7 @@ namespace FashionSense
             {
                 foreach (var fakeFarmer in searchMenu.fakeFarmers)
                 {
-                    UpdateElapsedDuration(fakeFarmer);
+                    FashionSense.UpdateElapsedDuration(fakeFarmer);
                 }
             }
 
@@ -463,18 +463,6 @@ namespace FashionSense
                 Game1.player.FarmerSprite.setCurrentFrame(_recordedPlayerFrames[_currentRecordedPlayerFrameIndex]);
 
                 Monitor.Log($"Playing frame {_recordedPlayerFrames[_currentRecordedPlayerFrameIndex]}", LogLevel.Debug);
-            }
-        }
-
-        private void UpdateElapsedDuration(Farmer who)
-        {
-            foreach (var animationData in animationManager.GetAllAnimationData(who))
-            {
-                var elapsedDuration = animationData.ElapsedDuration;
-                if (elapsedDuration < MAX_TRACKED_MILLISECONDS)
-                {
-                    animationData.ElapsedDuration = (elapsedDuration + Game1.currentGameTime.ElapsedGameTime.Milliseconds);
-                }
             }
         }
 
@@ -1586,6 +1574,18 @@ namespace FashionSense
             catch (Exception ex)
             {
                 Monitor.Log($"Error loading body from content pack {contentPack.Manifest.Name}: {ex}", LogLevel.Error);
+            }
+        }
+
+        internal static void UpdateElapsedDuration(Farmer who)
+        {
+            foreach (var animationData in animationManager.GetAllAnimationData(who))
+            {
+                var elapsedDuration = animationData.ElapsedDuration;
+                if (elapsedDuration < MAX_TRACKED_MILLISECONDS)
+                {
+                    animationData.ElapsedDuration = (elapsedDuration + Game1.currentGameTime.ElapsedGameTime.Milliseconds);
+                }
             }
         }
 

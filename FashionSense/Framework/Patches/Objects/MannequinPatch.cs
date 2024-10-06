@@ -32,6 +32,7 @@ namespace FashionSense.Framework.Patches.Objects
         internal void Apply(Harmony harmony)
         {
             harmony.Patch(AccessTools.Method(_entity, nameof(Mannequin.draw), new[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(float) }), prefix: new HarmonyMethod(GetType(), nameof(DrawPrefix)));
+            harmony.Patch(AccessTools.Method(_entity, nameof(Mannequin.updateWhenCurrentLocation), new[] { typeof(GameTime) }), postfix: new HarmonyMethod(GetType(), nameof(UpdateWhenCurrentLocationPostfix)));
             harmony.Patch(AccessTools.Method(_entity, nameof(Mannequin.performObjectDropInAction), new[] { typeof(Item), typeof(bool), typeof(Farmer), typeof(bool) }), prefix: new HarmonyMethod(GetType(), nameof(PerformObjectDropInActionPrefix)));
             harmony.Patch(AccessTools.Method(_entity, nameof(Mannequin.checkForAction), new[] { typeof(Farmer), typeof(bool) }), prefix: new HarmonyMethod(GetType(), nameof(CheckForActionPrefix)));
             harmony.Patch(AccessTools.Method(_entity, nameof(Mannequin.checkForAction), new[] { typeof(Farmer), typeof(bool) }), postfix: new HarmonyMethod(GetType(), nameof(CheckForActionPostfix)));
@@ -46,6 +47,23 @@ namespace FashionSense.Framework.Patches.Objects
             }
 
             return true;
+        }
+        
+
+        private static void UpdateWhenCurrentLocationPostfix(Mannequin __instance, Farmer ___renderCache, GameTime time)
+        {
+            Farmer farmer = ___renderCache;
+            if (farmer is null)
+            {
+                farmer = _helper.Reflection.GetMethod(__instance, "GetFarmerForRendering").Invoke<Farmer>();
+            }
+
+            if (farmer is null)
+            {
+                return;
+            }
+
+            FashionSense.UpdateElapsedDuration(farmer);
         }
 
         private static bool PerformObjectDropInActionPrefix(Mannequin __instance, ref bool __result, Item dropInItem, bool probe, Farmer who, bool returnFalseIfItemConsumed = false)
