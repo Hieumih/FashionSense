@@ -68,6 +68,11 @@ namespace FashionSense.Framework.Managers
             return (T)_appearanceTextures.FirstOrDefault(t => String.Equals(t.Id, appearanceId, StringComparison.OrdinalIgnoreCase) && t is T);
         }
 
+        public AppearanceContentPack GetAppearanceContentPackByItemId(string itemId)
+        {
+            return _appearanceTextures.FirstOrDefault(t => t.Item is not null && t.Item.Id == itemId);
+        }
+
         public AppearanceContentPack GetRandomAppearanceModel<T>()
         {
             var typedAppearanceModels = GetAllAppearanceModels().Where(m => m is T).ToList();

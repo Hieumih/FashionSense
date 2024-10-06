@@ -1,5 +1,17 @@
 {
   "Name": "Sandals",
+  "Item": {
+    "Description": "A pair of sandals.",
+    "InventoryScale": 0.75,
+    "SpritePosition": {
+      "X": 0,
+      "Y": 0
+    },
+    "SpriteSize": {
+      "Width": 16,
+      "Length": 16
+    }
+  },
   "FrontShoes": {
     "DrawOrderOverride": {
       "Preposition": "Before",

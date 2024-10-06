@@ -16,6 +16,7 @@ namespace FashionSense.Framework.Models.Appearances
         internal string Author { get; set; }
         public string Name { get; set; }
         public Version Format { get; set; } = new Version("1.0.0");
+        public ItemModel Item { get; set; }
         public List<string> Tags { get; set; } = new List<string>();
         internal string Id { get; set; }
         internal string PackName { get; set; }
@@ -29,6 +30,27 @@ namespace FashionSense.Framework.Models.Appearances
         internal bool IsTextureDirty { get; set; }
 
         internal abstract void LinkId();
+
+        internal void SetItemData()
+        {
+            if (Item is not null)
+            {
+                if (string.IsNullOrEmpty(Item.Id))
+                {
+                    Item.Id = $"{Id}/Item";
+                }
+
+                if (string.IsNullOrEmpty(Item.DisplayName))
+                {
+                    Item.DisplayName = Name;
+                }
+
+                if (string.IsNullOrEmpty(Item.Description))
+                {
+                    Item.Description = $"Added via Fashion Sense pack: {PackName}.";
+                }
+            }
+        }
 
         internal bool ResetTexture()
         {

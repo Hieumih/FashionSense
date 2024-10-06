@@ -1,5 +1,16 @@
 {
   "Name": "Pink Grass Skirt",
+  "Item": {
+    "InventoryScale": 1,
+    "SpritePosition": {
+      "X": 0,
+      "Y": 0
+    },
+    "SpriteSize": {
+      "Width": 16,
+      "Length": 7
+    }
+  },
   "FrontPants": {
     "DisableGrayscale": true,
     "StartingPosition": {
@@ -140,7 +151,7 @@
             "Value": true
           }
         ]
-      },
+      }
     ]
   },
   "BackPants": {
@@ -283,7 +294,7 @@
             "Value": true
           }
         ]
-      },
+      }
     ]
   },
   "RightPants": {

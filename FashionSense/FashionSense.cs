@@ -32,6 +32,8 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
+using StardewValley.GameData.Pants;
+using StardewValley.GameData.Shirts;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -125,8 +127,12 @@ namespace FashionSense
                 new FarmerPatch(monitor, modHelper).Apply(harmony);
 
                 // Apply object related patches
+                new ItemPatch(monitor, modHelper).Apply(harmony);
                 new ObjectPatch(monitor, modHelper).Apply(harmony);
                 new ColoredObjectPatch(monitor, modHelper).Apply(harmony);
+
+                // Apply clothing related patches
+                new ClothingPatch(monitor, modHelper).Apply(harmony);
 
                 // Apply core related patches
                 new GamePatch(monitor, modHelper).Apply(harmony);
@@ -275,6 +281,60 @@ namespace FashionSense
                 {
                     var data = asset.AsDictionary<string, string>().Data;
                     data[ModDataKeys.LETTER_HAND_MIRROR] = modHelper.Translation.Get("letters.hand_mirror");
+                });
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo("Data/Hats"))
+            {
+                e.Edit(asset =>
+                {
+                    var data = asset.AsDictionary<string, string>().Data;
+                    foreach (var hatModel in textureManager.GetAllAppearanceModels<HatContentPack>().Where(s => s.Item is not null))
+                    {
+                        data[hatModel.Item.Id] = $"{hatModel.Item.DisplayName}/{hatModel.Item.Description}/false/true//{hatModel.Item.DisplayName}";
+                    }
+                });
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo("Data/Shirts"))
+            {
+                e.Edit(asset =>
+                {
+                    var data = asset.AsDictionary<string, ShirtData>().Data;
+                    foreach (var shirtModel in textureManager.GetAllAppearanceModels<ShirtContentPack>().Where(s => s.Item is not null))
+                    {
+                        data[shirtModel.Item.Id] = new ShirtData()
+                        {
+                            DisplayName = shirtModel.Item.DisplayName,
+                            Description = shirtModel.Item.Description,
+                            Price = shirtModel.Item.Price
+                        };
+                    }
+                });
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo("Data/Pants"))
+            {
+                e.Edit(asset =>
+                {
+                    var data = asset.AsDictionary<string, PantsData>().Data;
+                    foreach (var pantsModel in textureManager.GetAllAppearanceModels<PantsContentPack>().Where(s => s.Item is not null))
+                    {
+                        data[pantsModel.Item.Id] = new PantsData()
+                        {
+                            DisplayName = pantsModel.Item.DisplayName,
+                            Description = pantsModel.Item.Description,
+                            Price = pantsModel.Item.Price
+                        };
+                    }
+                });
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo("Data/Boots"))
+            {
+                e.Edit(asset =>
+                {
+                    var data = asset.AsDictionary<string, string>().Data;
+                    foreach (var shoesModel in textureManager.GetAllAppearanceModels<ShoesContentPack>().Where(s => s.Item is not null))
+                    {
+                        data[shoesModel.Item.Id] = $"{shoesModel.Item.DisplayName}/{shoesModel.Item.Description}/{shoesModel.Item.Price}/0/0/0/{shoesModel.Item.DisplayName}";
+                    }
                 });
             }
             else if (e.NameWithoutLocale.IsEquivalentTo("Data/PeacefulEnd/FashionSense/AppearanceData"))
@@ -871,6 +931,18 @@ namespace FashionSense
                         continue;
                     }
 
+                    // Handle ItemModel, if given
+                    if (appearanceModel.Item is not null)
+                    {
+                        if (appearanceModel.Item.IsValid() is false)
+                        {
+                            Monitor.Log($"Unable to add hat for {appearanceModel.Name} from {contentPack.Manifest.Name}: Invalid Item property. Ensure that SpritePosition and SpriteSize are given.", LogLevel.Warn);
+                            continue;
+                        }
+
+                        appearanceModel.SetItemData();
+                    }
+
                     // Load in the texture
                     appearanceModel.Texture = contentPack.ModContent.Load<Texture2D>(contentPack.ModContent.GetInternalAssetName(Path.Combine(parentFolderName, textureFolder.Name, "hat.png")).Name);
 
@@ -987,6 +1059,18 @@ namespace FashionSense
                         continue;
                     }
 
+                    // Handle ItemModel, if given
+                    if (appearanceModel.Item is not null)
+                    {
+                        if (appearanceModel.Item.IsValid() is false)
+                        {
+                            Monitor.Log($"Unable to add shirt for {appearanceModel.Name} from {contentPack.Manifest.Name}: Invalid Item property. Ensure that SpritePosition and SpriteSize are given.", LogLevel.Warn);
+                            continue;
+                        }
+
+                        appearanceModel.SetItemData();
+                    }
+
                     // Load in the texture
                     appearanceModel.Texture = contentPack.ModContent.Load<Texture2D>(contentPack.ModContent.GetInternalAssetName(Path.Combine(parentFolderName, textureFolder.Name, "shirt.png")).Name);
 
@@ -1101,6 +1185,18 @@ namespace FashionSense
                     {
                         Monitor.Log($"Unable to add pants for {appearanceModel.Name} from {contentPack.Manifest.Name}: No associated pants.png given", LogLevel.Warn);
                         continue;
+                    }
+
+                    // Handle ItemModel, if given
+                    if (appearanceModel.Item is not null)
+                    {
+                        if (appearanceModel.Item.IsValid() is false)
+                        {
+                            Monitor.Log($"Unable to add pants for {appearanceModel.Name} from {contentPack.Manifest.Name}: Invalid Item property. Ensure that SpritePosition and SpriteSize are given.", LogLevel.Warn);
+                            continue;
+                        }
+
+                        appearanceModel.SetItemData();
                     }
 
                     // Load in the texture
@@ -1333,6 +1429,18 @@ namespace FashionSense
                     {
                         Monitor.Log($"Unable to add shoes for {appearanceModel.Name} from {contentPack.Manifest.Name}: No associated shoes.png given", LogLevel.Warn);
                         continue;
+                    }
+
+                    // Handle ItemModel, if given
+                    if (appearanceModel.Item is not null)
+                    {
+                        if (appearanceModel.Item.IsValid() is false)
+                        {
+                            Monitor.Log($"Unable to add shoes for {appearanceModel.Name} from {contentPack.Manifest.Name}: Invalid Item property. Ensure that SpritePosition and SpriteSize are given.", LogLevel.Warn);
+                            continue;
+                        }
+
+                        appearanceModel.SetItemData();
                     }
 
                     // Load in the texture
