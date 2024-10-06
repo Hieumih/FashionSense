@@ -103,7 +103,7 @@ namespace FashionSense.Framework.Patches.Objects
             if (farmer is not null && AppearanceHelpers.GetCurrentlyEquippedModels(farmer, __instance.facing.Value).Count > 0)
             {
                 CopyModDataFromMannequinToFarmer(__instance, who);
-                Game1.addHUDMessage(new HUDMessage(_helper.Translation.Get("messages.warning.mannequin_copied_appearance"), 3));
+                Game1.addHUDMessage(new HUDMessage(_helper.Translation.Get("messages.warning.mannequin_copied_appearance"), 2));
             }
 
             return false;
