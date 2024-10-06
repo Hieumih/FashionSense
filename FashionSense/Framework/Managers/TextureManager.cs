@@ -60,7 +60,7 @@ namespace FashionSense.Framework.Managers
 
         public List<T> GetAllAppearanceModels<T>() where T : AppearanceContentPack
         {
-            return _appearanceTextures.Where(t => t is T) as List<T>;
+            return _appearanceTextures.OfType<T>().ToList();
         }
 
         public T GetSpecificAppearanceModel<T>(string appearanceId) where T : AppearanceContentPack
