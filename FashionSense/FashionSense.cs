@@ -1,3 +1,4 @@
+using FashionSense.Framework;
 using FashionSense.Framework.External.ContentPatcher;
 using FashionSense.Framework.Interfaces.API;
 using FashionSense.Framework.Managers;
@@ -57,6 +58,7 @@ namespace FashionSense
         internal static TextureManager textureManager;
 
         // Utilities
+        internal static ModConfig modConfig;
         internal static Api internalApi;
         internal static ConditionData conditionData;
         internal static Dictionary<string, ConditionGroup> conditionGroups;
@@ -80,6 +82,7 @@ namespace FashionSense
             monitor = Monitor;
             modHelper = helper;
             modManifest = ModManifest;
+            modConfig = modHelper.ReadConfig<ModConfig>();
 
             // Load managers
             accessoryManager = new AccessoryManager(monitor);
@@ -88,7 +91,7 @@ namespace FashionSense
             assetManager = new AssetManager(modHelper);
             colorManager = new ColorManager(monitor);
             layerManager = new LayerManager(monitor);
-            messageManager = new MessageManager(monitor, helper, ModManifest.UniqueID);
+            messageManager = new MessageManager(monitor, modHelper, ModManifest.UniqueID);
             outfitManager = new OutfitManager(monitor);
             textureManager = new TextureManager(monitor);
 
@@ -148,6 +151,7 @@ namespace FashionSense
             helper.Events.Content.AssetRequested += OnAssetRequested;
             helper.Events.Content.AssetsInvalidated += OnAssetInvalidated;
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+            helper.Events.Input.ButtonPressed += OnButtonPressed;
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
             helper.Events.GameLoop.DayStarted += OnDayStarted;
             helper.Events.Player.Warped += OnWarped;
@@ -234,8 +238,33 @@ namespace FashionSense
                 apiManager.GetContentPatcherApi().RegisterToken(ModManifest, "Appearance", new AppearanceToken());
             }
 
+            if (Helper.ModRegistry.IsLoaded("spacechase0.GenericModConfigMenu") && apiManager.HookIntoGenericModConfigMenu(Helper))
+            {
+                apiManager.RegisterGenericModConfigMenu(Helper, ModManifest);
+            }
+
             // Load any owned content packs
             this.LoadContentPacks();
+        }
+
+        private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
+        {
+            if (Context.IsWorldReady is false || Game1.activeClickableMenu is not null || Game1.player is null)
+            {
+                return;
+            }
+
+            if (e.Button == modConfig.QuickMenuKey)
+            {
+                if (modConfig.RequireHandMirrorInInventory && Game1.player.Items.Any(i => i is not null && i.modData is not null && i.modData.ContainsKey(ModDataKeys.HAND_MIRROR_FLAG)) is false)
+                {
+                    Game1.addHUDMessage(new HUDMessage(Helper.Translation.Get("messages.warning.requires_hand_mirror"), 3));
+                }
+                else
+                {
+                    Game1.activeClickableMenu = new HandMirrorMenu();
+                }
+            }
         }
 
         private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
