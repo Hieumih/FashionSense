@@ -4,7 +4,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
-using StardewValley.Objects;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
