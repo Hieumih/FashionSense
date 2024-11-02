@@ -591,18 +591,33 @@ namespace FashionSense
             }
         }
 
+        private static DirectoryInfo GetContentPackDirectory(IContentPack contentPack, string targetDirectoryName)
+        {
+            var contentPackDirectory = new DirectoryInfo(contentPack.DirectoryPath);
+
+            foreach (var directory in contentPackDirectory.GetDirectories())
+            {
+                if (directory.Name.Equals(targetDirectoryName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return directory;
+                }
+            }
+
+            return new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, targetDirectoryName));
+        }
+
         private void AddHairContentPacks(IContentPack contentPack)
         {
             try
             {
-                var directoryPath = new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, "Hairs"));
+                var directoryPath = GetContentPackDirectory(contentPack, "Hairs");
                 if (!directoryPath.Exists)
                 {
                     Monitor.Log($"No Hairs folder found for the content pack {contentPack.Manifest.Name}", LogLevel.Trace);
                     return;
                 }
 
-                var hairFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories);
+                var hairFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories).OrderBy(d => d.Name);
                 if (hairFolders.Count() == 0)
                 {
                     Monitor.Log($"No sub-folders found under Hairs for the content pack {contentPack.Manifest.Name}", LogLevel.Warn);
@@ -711,14 +726,14 @@ namespace FashionSense
         {
             try
             {
-                var directoryPath = new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, "Accessories"));
+                var directoryPath = GetContentPackDirectory(contentPack, "Accessories");
                 if (!directoryPath.Exists)
                 {
                     Monitor.Log($"No Accessories folder found for the content pack {contentPack.Manifest.Name}", LogLevel.Trace);
                     return;
                 }
 
-                var accessoryFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories);
+                var accessoryFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories).OrderBy(d => d.Name);
                 if (accessoryFolders.Count() == 0)
                 {
                     Monitor.Log($"No sub-folders found under Accessories for the content pack {contentPack.Manifest.Name}", LogLevel.Warn);
@@ -827,14 +842,14 @@ namespace FashionSense
         {
             try
             {
-                var directoryPath = new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, "Hats"));
+                var directoryPath = GetContentPackDirectory(contentPack, "Hats");
                 if (!directoryPath.Exists)
                 {
                     Monitor.Log($"No Hats folder found for the content pack {contentPack.Manifest.Name}", LogLevel.Trace);
                     return;
                 }
 
-                var hatFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories);
+                var hatFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories).OrderBy(d => d.Name);
                 if (hatFolders.Count() == 0)
                 {
                     Monitor.Log($"No sub-folders found under Hats for the content pack {contentPack.Manifest.Name}", LogLevel.Warn);
@@ -955,14 +970,14 @@ namespace FashionSense
         {
             try
             {
-                var directoryPath = new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, "Shirts"));
+                var directoryPath = GetContentPackDirectory(contentPack, "Shirts");
                 if (!directoryPath.Exists)
                 {
                     Monitor.Log($"No Shirts folder found for the content pack {contentPack.Manifest.Name}", LogLevel.Trace);
                     return;
                 }
 
-                var shirtFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories);
+                var shirtFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories).OrderBy(d => d.Name);
                 if (shirtFolders.Count() == 0)
                 {
                     Monitor.Log($"No sub-folders found under Shirts for the content pack {contentPack.Manifest.Name}", LogLevel.Warn);
@@ -1083,14 +1098,14 @@ namespace FashionSense
         {
             try
             {
-                var directoryPath = new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, "Pants"));
+                var directoryPath = GetContentPackDirectory(contentPack, "Pants");
                 if (!directoryPath.Exists)
                 {
                     Monitor.Log($"No Pants folder found for the content pack {contentPack.Manifest.Name}", LogLevel.Trace);
                     return;
                 }
 
-                var pantsFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories);
+                var pantsFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories).OrderBy(d => d.Name);
                 if (pantsFolders.Count() == 0)
                 {
                     Monitor.Log($"No sub-folders found under Pants for the content pack {contentPack.Manifest.Name}", LogLevel.Warn);
@@ -1211,14 +1226,14 @@ namespace FashionSense
         {
             try
             {
-                var directoryPath = new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, "Sleeves"));
+                var directoryPath = GetContentPackDirectory(contentPack, "Sleeves");
                 if (!directoryPath.Exists)
                 {
                     Monitor.Log($"No Sleeves folder found for the content pack {contentPack.Manifest.Name}", LogLevel.Trace);
                     return;
                 }
 
-                var sleevesFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories);
+                var sleevesFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories).OrderBy(d => d.Name);
                 if (sleevesFolders.Count() == 0)
                 {
                     Monitor.Log($"No sub-folders found under Sleeves for the content pack {contentPack.Manifest.Name}", LogLevel.Warn);
@@ -1327,14 +1342,14 @@ namespace FashionSense
         {
             try
             {
-                var directoryPath = new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, "Shoes"));
+                var directoryPath = GetContentPackDirectory(contentPack, "Shoes");
                 if (!directoryPath.Exists)
                 {
                     Monitor.Log($"No Shoes folder found for the content pack {contentPack.Manifest.Name}", LogLevel.Trace);
                     return;
                 }
 
-                var shoesFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories);
+                var shoesFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories).OrderBy(d => d.Name);
                 if (shoesFolders.Count() == 0)
                 {
                     Monitor.Log($"No sub-folders found under Shoes for the content pack {contentPack.Manifest.Name}", LogLevel.Warn);
@@ -1455,14 +1470,14 @@ namespace FashionSense
         {
             try
             {
-                var directoryPath = new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, "Bodies"));
+                var directoryPath = GetContentPackDirectory(contentPack, "Bodies");
                 if (!directoryPath.Exists)
                 {
                     Monitor.Log($"No Bodies folder found for the content pack {contentPack.Manifest.Name}", LogLevel.Trace);
                     return;
                 }
 
-                var bodiesFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories);
+                var bodiesFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories).OrderBy(d => d.Name);
                 if (bodiesFolders.Count() == 0)
                 {
                     Monitor.Log($"No sub-folders found under Bodies for the content pack {contentPack.Manifest.Name}", LogLevel.Warn);
