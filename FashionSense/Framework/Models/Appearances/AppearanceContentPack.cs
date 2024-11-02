@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace FashionSense.Framework.Models.Appearances
 {
-    public abstract class AppearanceContentPack
+    public class AppearanceContentPack
     {
         public bool IsLocked { get; set; }
         internal IApi.Type PackType { get; set; }
@@ -29,7 +29,11 @@ namespace FashionSense.Framework.Models.Appearances
         internal Texture2D CollectiveMaskTexture { get; set; }
         internal bool IsTextureDirty { get; set; }
 
-        internal abstract void LinkId();
+        // Overriden by inherited classes
+        internal virtual void LinkId()
+        {
+            // Note: Used to be abstract, but needed to be virtual to support Content Patcher
+        }
 
         internal void SetItemData()
         {
