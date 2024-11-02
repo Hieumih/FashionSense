@@ -10,17 +10,19 @@ namespace FashionSense.Framework.Models.Appearances
 {
     public class AppearanceContentPack
     {
+        internal bool IsLocalPack { get; set; }
         public bool IsLocked { get; set; }
-        internal IApi.Type PackType { get; set; }
+        public IApi.Type PackType { get; set; }
         internal string Owner { get; set; }
-        internal string Author { get; set; }
+        public string Author { get; set; }
         public string Name { get; set; }
         public Version Format { get; set; } = new Version("1.0.0");
         public ItemModel Item { get; set; }
         public List<string> Tags { get; set; } = new List<string>();
         internal string Id { get; set; }
-        internal string PackName { get; set; }
-        internal string PackId { get; set; }
+        public string PackName { get; set; }
+        public string PackId { get; set; }
+        public string TexturePath { get; set; } // Only used for appearances added externally (such as Content Patcher)
         internal Texture2D Texture { get { return _texture; } set { _cachedTexture = value; ResetTexture(); } }
         private Texture2D _texture;
         private Texture2D _cachedTexture;

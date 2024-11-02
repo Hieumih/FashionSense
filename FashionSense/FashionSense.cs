@@ -338,22 +338,99 @@ namespace FashionSense
                     }
                 });
             }
-            else if (e.NameWithoutLocale.IsEquivalentTo("Data/PeacefulEnd/FashionSense/AppearanceData"))
+            else if (e.NameWithoutLocale.IsEquivalentTo($"Data/PeacefulEnd/FashionSense/AppearanceData"))
             {
-                e.LoadFrom(() => textureManager.GetIdToAppearanceModels(), AssetLoadPriority.High);
+                e.LoadFrom(() => textureManager.GetIdToAppearanceModels<AppearanceContentPack>(), AssetLoadPriority.High);
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo($"Data/PeacefulEnd/FashionSense/AccessoryData"))
+            {
+                e.LoadFrom(() => textureManager.GetIdToAppearanceModels<AccessoryContentPack>(), AssetLoadPriority.High);
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo($"Data/PeacefulEnd/FashionSense/HatData"))
+            {
+                e.LoadFrom(() => textureManager.GetIdToAppearanceModels<HatContentPack>(), AssetLoadPriority.High);
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo($"Data/PeacefulEnd/FashionSense/HairData"))
+            {
+                e.LoadFrom(() => textureManager.GetIdToAppearanceModels<HairContentPack>(), AssetLoadPriority.High);
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo($"Data/PeacefulEnd/FashionSense/ShirtData"))
+            {
+                e.LoadFrom(() => textureManager.GetIdToAppearanceModels<ShirtContentPack>(), AssetLoadPriority.High);
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo($"Data/PeacefulEnd/FashionSense/SleevesData"))
+            {
+                e.LoadFrom(() => textureManager.GetIdToAppearanceModels<SleevesContentPack>(), AssetLoadPriority.High);
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo($"Data/PeacefulEnd/FashionSense/PantsData"))
+            {
+                e.LoadFrom(() => textureManager.GetIdToAppearanceModels<PantsContentPack>(), AssetLoadPriority.High);
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo($"Data/PeacefulEnd/FashionSense/ShoesData"))
+            {
+                e.LoadFrom(() => textureManager.GetIdToAppearanceModels<ShoesContentPack>(), AssetLoadPriority.High);
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo($"Data/PeacefulEnd/FashionSense/BodyData"))
+            {
+                e.LoadFrom(() => textureManager.GetIdToAppearanceModels<BodyContentPack>(), AssetLoadPriority.High);
             }
         }
 
         private void OnAssetInvalidated(object sender, AssetsInvalidatedEventArgs e)
         {
-            var asset = e.NamesWithoutLocale.FirstOrDefault(a => a.IsEquivalentTo("Data/PeacefulEnd/FashionSense/AppearanceData"));
-            if (asset is null)
+            var appearanceDataAsset = e.NamesWithoutLocale.FirstOrDefault(a => a.IsEquivalentTo("Data/PeacefulEnd/FashionSense/AppearanceData"));
+            if (appearanceDataAsset is not null)
             {
-                return;
+                textureManager.Sync(Helper.GameContent.Load<Dictionary<string, AppearanceContentPack>>(appearanceDataAsset));
             }
 
-            // Force load the changes
-            _ = Helper.GameContent.Load<Dictionary<string, AppearanceContentPack>>(asset);
+            var accessoryDataAsset = e.NamesWithoutLocale.FirstOrDefault(a => a.IsEquivalentTo("Data/PeacefulEnd/FashionSense/AccessoryData"));
+            if (accessoryDataAsset is not null)
+            {
+                textureManager.Sync(Helper.GameContent.Load<Dictionary<string, AccessoryContentPack>>(accessoryDataAsset), IApi.Type.Accessory);
+            }
+
+            var hatDataAsset = e.NamesWithoutLocale.FirstOrDefault(a => a.IsEquivalentTo("Data/PeacefulEnd/FashionSense/HatData"));
+            if (hatDataAsset is not null)
+            {
+                textureManager.Sync(Helper.GameContent.Load<Dictionary<string, HatContentPack>>(hatDataAsset), IApi.Type.Hat);
+            }
+
+            var hairDataAsset = e.NamesWithoutLocale.FirstOrDefault(a => a.IsEquivalentTo("Data/PeacefulEnd/FashionSense/HairData"));
+            if (hairDataAsset is not null)
+            {
+                textureManager.Sync(Helper.GameContent.Load<Dictionary<string, HairContentPack>>(hairDataAsset), IApi.Type.Hair);
+            }
+
+            var shirtDataAsset = e.NamesWithoutLocale.FirstOrDefault(a => a.IsEquivalentTo("Data/PeacefulEnd/FashionSense/ShirtData"));
+            if (shirtDataAsset is not null)
+            {
+                textureManager.Sync(Helper.GameContent.Load<Dictionary<string, ShirtContentPack>>(shirtDataAsset), IApi.Type.Shirt);
+            }
+
+            var sleevesDataAsset = e.NamesWithoutLocale.FirstOrDefault(a => a.IsEquivalentTo("Data/PeacefulEnd/FashionSense/SleevesData"));
+            if (sleevesDataAsset is not null)
+            {
+                textureManager.Sync(Helper.GameContent.Load<Dictionary<string, SleevesContentPack>>(sleevesDataAsset), IApi.Type.Sleeves);
+            }
+
+            var pantsDataAsset = e.NamesWithoutLocale.FirstOrDefault(a => a.IsEquivalentTo("Data/PeacefulEnd/FashionSense/PantsData"));
+            if (pantsDataAsset is not null)
+            {
+                textureManager.Sync(Helper.GameContent.Load<Dictionary<string, PantsContentPack>>(pantsDataAsset), IApi.Type.Pants);
+            }
+
+            var shoesDataAsset = e.NamesWithoutLocale.FirstOrDefault(a => a.IsEquivalentTo("Data/PeacefulEnd/FashionSense/ShoesData"));
+            if (shoesDataAsset is not null)
+            {
+                textureManager.Sync(Helper.GameContent.Load<Dictionary<string, ShoesContentPack>>(shoesDataAsset), IApi.Type.Shoes);
+            }
+
+            var bodyDataAsset = e.NamesWithoutLocale.FirstOrDefault(a => a.IsEquivalentTo("Data/PeacefulEnd/FashionSense/BodyData"));
+            if (bodyDataAsset is not null)
+            {
+                textureManager.Sync(Helper.GameContent.Load<Dictionary<string, BodyContentPack>>(bodyDataAsset), IApi.Type.Player);
+            }
         }
 
         private void OnSaveLoaded(object sender, StardewModdingAPI.Events.SaveLoadedEventArgs e)
@@ -412,7 +489,16 @@ namespace FashionSense
             SetSpriteDirty(Game1.player);
 
             // Load our Data/PeacefulEnd/FashionSense/AppearanceData
-            _ = Helper.GameContent.Load<Dictionary<string, AppearanceContentPack>>("Data/PeacefulEnd/FashionSense/AppearanceData");
+            textureManager.Sync(Helper.GameContent.Load<Dictionary<string, AppearanceContentPack>>("Data/PeacefulEnd/FashionSense/AppearanceData"));
+
+            textureManager.Sync(Helper.GameContent.Load<Dictionary<string, AccessoryContentPack>>("Data/PeacefulEnd/FashionSense/AccessoryData"), IApi.Type.Accessory);
+            textureManager.Sync(Helper.GameContent.Load<Dictionary<string, HatContentPack>>("Data/PeacefulEnd/FashionSense/HatData"), IApi.Type.Hat);
+            textureManager.Sync(Helper.GameContent.Load<Dictionary<string, HairContentPack>>("Data/PeacefulEnd/FashionSense/HairData"), IApi.Type.Hair);
+            textureManager.Sync(Helper.GameContent.Load<Dictionary<string, ShirtContentPack>>("Data/PeacefulEnd/FashionSense/ShirtData"), IApi.Type.Shirt);
+            textureManager.Sync(Helper.GameContent.Load<Dictionary<string, SleevesContentPack>>("Data/PeacefulEnd/FashionSense/SleevesData"), IApi.Type.Sleeves);
+            textureManager.Sync(Helper.GameContent.Load<Dictionary<string, PantsContentPack>>("Data/PeacefulEnd/FashionSense/PantsData"), IApi.Type.Pants);
+            textureManager.Sync(Helper.GameContent.Load<Dictionary<string, ShoesContentPack>>("Data/PeacefulEnd/FashionSense/ShoesData"), IApi.Type.Shoes);
+            textureManager.Sync(Helper.GameContent.Load<Dictionary<string, BodyContentPack>>("Data/PeacefulEnd/FashionSense/BodyData"), IApi.Type.Player);
 
             // Check if we need to give a Hand Mirror at the start of the game
             if (SDate.Now().DaysSinceStart == 1 && Game1.player.modData.ContainsKey(ModDataKeys.STARTS_WITH_HAND_MIRROR))
@@ -525,6 +611,7 @@ namespace FashionSense
                     Owner = "PeacefulEnd",
                     Name = modHelper.Translation.Get("ui.fashion_sense.color_override.shoes"),
                     PackType = IApi.Type.Shoes,
+                    PackId = ModDataKeys.INTERNAL_COLOR_OVERRIDE_SHOE_ID,
                     PackName = modHelper.Translation.Get("ui.fashion_sense.color_override.shoes"),
                     Id = ModDataKeys.INTERNAL_COLOR_OVERRIDE_SHOE_ID,
                     FrontShoes = new ShoesModel(),
@@ -544,6 +631,7 @@ namespace FashionSense
                     Owner = "PeacefulEnd",
                     Name = modHelper.Translation.Get("ui.fashion_sense.color_override.body"),
                     PackType = IApi.Type.Player,
+                    PackId = ModDataKeys.INTERNAL_COLOR_OVERRIDE_BODY_ID,
                     PackName = modHelper.Translation.Get("ui.fashion_sense.color_override.body"),
                     Id = ModDataKeys.INTERNAL_COLOR_OVERRIDE_BODY_ID,
                     FrontBody = new BodyModel(),
@@ -627,6 +715,7 @@ namespace FashionSense
 
                     // Parse the model and assign it the content pack's owner
                     HairContentPack appearanceModel = contentPack.ReadJsonFile<HairContentPack>(modelPath);
+                    appearanceModel.IsLocalPack = true;
                     appearanceModel.Author = contentPack.Manifest.Author;
                     appearanceModel.Owner = contentPack.Manifest.UniqueID;
 
@@ -743,6 +832,7 @@ namespace FashionSense
 
                     // Parse the model and assign it the content pack's owner
                     AccessoryContentPack appearanceModel = contentPack.ReadJsonFile<AccessoryContentPack>(modelPath);
+                    appearanceModel.IsLocalPack = true;
                     appearanceModel.Author = contentPack.Manifest.Author;
                     appearanceModel.Owner = contentPack.Manifest.UniqueID;
 
@@ -859,6 +949,7 @@ namespace FashionSense
 
                     // Parse the model and assign it the content pack's owner
                     HatContentPack appearanceModel = contentPack.ReadJsonFile<HatContentPack>(modelPath);
+                    appearanceModel.IsLocalPack = true;
                     appearanceModel.Author = contentPack.Manifest.Author;
                     appearanceModel.Owner = contentPack.Manifest.UniqueID;
 
@@ -987,6 +1078,7 @@ namespace FashionSense
 
                     // Parse the model and assign it the content pack's owner
                     ShirtContentPack appearanceModel = contentPack.ReadJsonFile<ShirtContentPack>(modelPath);
+                    appearanceModel.IsLocalPack = true;
                     appearanceModel.Author = contentPack.Manifest.Author;
                     appearanceModel.Owner = contentPack.Manifest.UniqueID;
 
@@ -1115,6 +1207,7 @@ namespace FashionSense
 
                     // Parse the model and assign it the content pack's owner
                     PantsContentPack appearanceModel = contentPack.ReadJsonFile<PantsContentPack>(modelPath);
+                    appearanceModel.IsLocalPack = true;
                     appearanceModel.Author = contentPack.Manifest.Author;
                     appearanceModel.Owner = contentPack.Manifest.UniqueID;
 
@@ -1243,6 +1336,7 @@ namespace FashionSense
 
                     // Parse the model and assign it the content pack's owner
                     SleevesContentPack appearanceModel = contentPack.ReadJsonFile<SleevesContentPack>(modelPath);
+                    appearanceModel.IsLocalPack = true;
                     appearanceModel.Author = contentPack.Manifest.Author;
                     appearanceModel.Owner = contentPack.Manifest.UniqueID;
 
@@ -1359,6 +1453,7 @@ namespace FashionSense
 
                     // Parse the model and assign it the content pack's owner
                     ShoesContentPack appearanceModel = contentPack.ReadJsonFile<ShoesContentPack>(modelPath);
+                    appearanceModel.IsLocalPack = true;
                     appearanceModel.Author = contentPack.Manifest.Author;
                     appearanceModel.Owner = contentPack.Manifest.UniqueID;
 
@@ -1487,6 +1582,7 @@ namespace FashionSense
 
                     // Parse the model and assign it the content pack's owner
                     BodyContentPack appearanceModel = contentPack.ReadJsonFile<BodyContentPack>(modelPath);
+                    appearanceModel.IsLocalPack = true;
                     appearanceModel.Author = contentPack.Manifest.Author;
                     appearanceModel.Owner = contentPack.Manifest.UniqueID;
 
