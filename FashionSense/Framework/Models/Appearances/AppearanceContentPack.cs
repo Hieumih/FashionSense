@@ -18,6 +18,7 @@ namespace FashionSense.Framework.Models.Appearances
         public string Name { get; set; }
         public Version Format { get; set; } = new Version("1.0.0");
         public ItemModel Item { get; set; }
+        public string FromItemId { get; set; }
         public List<string> Tags { get; set; } = new List<string>();
         internal string Id { get; set; }
         public string PackName { get; set; }
