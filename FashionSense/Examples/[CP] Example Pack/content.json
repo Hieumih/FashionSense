@@ -3,7 +3,7 @@
   "Changes": [
     {
       "Action": "EditData",
-      "Target": "Data/PeacefulEnd/FashionSense/AppearanceData",
+      "Target": "Data/PeacefulEnd/FashionSense/HatData",
       "Fields": {
         "ExampleAuthor.ExampleFashionSensePack/Hat/Animated Pumpkin Head": {
           "IsLocked": true
@@ -16,7 +16,7 @@
     },
     {
       "Action": "EditData",
-      "Target": "Data/PeacefulEnd/FashionSense/AppearanceData",
+      "Target": "Data/PeacefulEnd/FashionSense/HatData",
       "Fields": {
         "ExampleAuthor.ExampleFashionSensePack/Hat/Animated Pumpkin Head": {
           "IsLocked": false
@@ -26,6 +26,71 @@
         "Time": "{{Range: 1900, 2600}}"
       },
       "Update": "OnTimeChange"
+    },
+
+    // Load in the Hat textures
+    {
+      "Action": "Load",
+      "Target": "Mods.PeacefulEnd.ContentPatcherForFashionSense.TestHat",
+      "FromFile": "assets/test_hat.png"
+    },
+    {
+      "Action": "Load",
+      "Target": "Mods.PeacefulEnd.ContentPatcherForFashionSense.ActualHat",
+      "FromFile": "assets/actual_hat.png"
+    },
+    // Load in the Fashion Sense Hat
+    {
+      "Action": "EditData",
+      "Target": "Data/PeacefulEnd/FashionSense/HatData",
+      "Entries": {
+        // The key should follow the format: PackId/PackType/Name
+        "ExampleAuthor.ContentPatcherForFashionSense/Hat/Test Hat": {
+          "Author": "ExampleAuthor", // The author name to display in the Hand Mirror when using the given Fashion Sense pack
+          "PackName": "FS Appearances via Content Patcher", // Name of the Fashion Sense pack (multiple appearances may be part of a pack)
+          "PackId": "ExampleAuthor.ContentPatcherForFashionSense", // ID of the Fashion Sense pack, usually the manifest ID of the manifest.json
+          "Name": "Test Hat", // Name of the Fashion Sense item
+          "TexturePath": "Mods.PeacefulEnd.ContentPatcherForFashionSense.TestHat",
+          "FrontHat": {
+            "DisableGrayscale": true,
+            "StartingPosition": {
+              "X": 0,
+              "Y": 0
+            },
+            "HeadPosition": {
+              "X": -2,
+              "Y": 0
+            },
+            "HatSize": {
+              "Width": 16,
+              "Length": 16
+            }
+          }
+        }
+      }
+    },
+    // Load in an in-game hat, to use as a Fashion Sense Hat
+    // add hat data
+    {
+      "Action": "EditData",
+      "Target": "Data/Hats",
+      "Entries": {
+        "ExampleAuthor.ContentPatcherForFashionSense/Hat/Actual Hat": "ExampleAuthor.ContentPatcherForFashionSense.Hat.Actual Hat/An actual hat./true/true//Actual Hat/0/Mods.PeacefulEnd.ContentPatcherForFashionSense.ActualHat"
+      }
+    },
+    // Load in the Fashion Sense Hat (by using an existing in-game hat)
+    {
+      "Action": "EditData",
+      "Target": "Data/PeacefulEnd/FashionSense/HatData",
+      "Entries": {
+        // The key should follow the format: PackId/PackType/Name
+        "ExampleAuthor.ContentPatcherForFashionSense/Hat/Test Hat": {
+          "Author": "ExampleAuthor", // The author name to display in the Hand Mirror when using the given Fashion Sense pack
+          "PackName": "FS Appearances via Content Patcher", // Name of the Fashion Sense pack (multiple appearances may be part of a pack)
+          "PackId": "ExampleAuthor.ContentPatcherForFashionSense", // ID of the Fashion Sense pack, usually the manifest ID of the manifest.json
+          "FromItemId": "(H)ExampleAuthor.ContentPatcherForFashionSense/Hat/Actual Hat"
+        }
+      }
     }
   ]
 }

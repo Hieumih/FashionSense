@@ -1,16 +1,7 @@
-﻿using FashionSense.Framework.Patches.Renderer;
-using FashionSense.Framework.Utilities;
+﻿using FashionSense.Framework.Utilities;
 using HarmonyLib;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
-using StardewValley.Objects;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Reflection.Emit;
-using xTile.Dimensions;
 
 namespace FashionSense.Framework.Patches.Objects
 {

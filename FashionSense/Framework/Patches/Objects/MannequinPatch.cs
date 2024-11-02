@@ -1,5 +1,4 @@
 ﻿using FashionSense.Framework.Models;
-using FashionSense.Framework.Patches.Renderer;
 using FashionSense.Framework.Utilities;
 using HarmonyLib;
 using Microsoft.Xna.Framework;
@@ -7,16 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 using StardewModdingAPI;
 using StardewValley;
-using StardewValley.Characters;
-using StardewValley.GameData;
-using StardewValley.Monsters;
 using StardewValley.Objects;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Reflection.Emit;
-using xTile.Dimensions;
 
 namespace FashionSense.Framework.Patches.Objects
 {
@@ -48,7 +38,7 @@ namespace FashionSense.Framework.Patches.Objects
 
             return true;
         }
-        
+
 
         private static void UpdateWhenCurrentLocationPostfix(Mannequin __instance, Farmer ___renderCache, GameTime time)
         {

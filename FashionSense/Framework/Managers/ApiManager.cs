@@ -1,6 +1,5 @@
 ﻿using FashionSense.Framework.Interfaces;
 using StardewModdingAPI;
-using System;
 
 namespace FashionSense.Framework.Managers
 {
