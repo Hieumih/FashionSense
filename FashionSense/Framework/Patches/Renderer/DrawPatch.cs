@@ -307,7 +307,7 @@ namespace FashionSense.Framework.Patches.Renderer
             ___rotationAdjustment = Vector2.Zero;
             ___positionOffset.Y = animationFrame.positionOffset * 4;
             ___positionOffset.X = animationFrame.xOffset * 4;
-            if (!FarmerRenderer.isDrawingForUI && (bool)who.swimming.Value)
+            if (!FarmerRenderer.isDrawingForUI && who.swimming.Value)
             {
                 sourceRect.Height /= 2;
                 sourceRect.Height -= (int)who.yOffset / 4;
@@ -405,9 +405,9 @@ namespace FashionSense.Framework.Patches.Renderer
             // Set the source rectangles for vanilla shirts, accessories and hats
             who.GetDisplayShirt(out var shirtTexture, out var shirtIndex);
             ___shirtSourceRect = new Rectangle(shirtIndex * 8 % 128, shirtIndex * 8 / 128 * 32, 8, 8);
-            if ((int)who.accessory.Value >= 0)
+            if (who.accessory.Value >= 0)
             {
-                ___accessorySourceRect = new Rectangle((int)who.accessory.Value * 16 % FarmerRenderer.accessoriesTexture.Width, (int)who.accessory.Value * 16 / FarmerRenderer.accessoriesTexture.Width * 32, 16, 16);
+                ___accessorySourceRect = new Rectangle(who.accessory.Value * 16 % FarmerRenderer.accessoriesTexture.Width, who.accessory.Value * 16 / FarmerRenderer.accessoriesTexture.Width * 32, 16, 16);
             }
             if (who.hat.Value != null)
             {
