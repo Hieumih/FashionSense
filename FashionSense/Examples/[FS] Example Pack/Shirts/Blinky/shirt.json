@@ -1,5 +1,18 @@
 {
   "Name": "Blinky",
+  "Item": {
+    "DisplayName": "Blinky Shirt",
+    "Description": "Did it just blink?",
+    "Price": 1000,
+    "SpritePosition": {
+      "X": 0,
+      "Y": 0
+    },
+    "SpriteSize": {
+      "Width": 8,
+      "Length": 8
+    }
+  },
   "FrontShirt": {
     "DisableGrayscale": true,
     "StartingPosition": {

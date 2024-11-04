@@ -1,3 +1,4 @@
+using FashionSense.Framework;
 using FashionSense.Framework.External.ContentPatcher;
 using FashionSense.Framework.Interfaces.API;
 using FashionSense.Framework.Managers;
@@ -31,6 +32,8 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
+using StardewValley.GameData.Pants;
+using StardewValley.GameData.Shirts;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -57,6 +60,7 @@ namespace FashionSense
         internal static TextureManager textureManager;
 
         // Utilities
+        internal static ModConfig modConfig;
         internal static Api internalApi;
         internal static ConditionData conditionData;
         internal static Dictionary<string, ConditionGroup> conditionGroups;
@@ -80,6 +84,7 @@ namespace FashionSense
             monitor = Monitor;
             modHelper = helper;
             modManifest = ModManifest;
+            modConfig = modHelper.ReadConfig<ModConfig>();
 
             // Load managers
             accessoryManager = new AccessoryManager(monitor);
@@ -88,7 +93,7 @@ namespace FashionSense
             assetManager = new AssetManager(modHelper);
             colorManager = new ColorManager(monitor);
             layerManager = new LayerManager(monitor);
-            messageManager = new MessageManager(monitor, helper, ModManifest.UniqueID);
+            messageManager = new MessageManager(monitor, modHelper, ModManifest.UniqueID);
             outfitManager = new OutfitManager(monitor);
             textureManager = new TextureManager(monitor);
 
@@ -122,8 +127,13 @@ namespace FashionSense
                 new FarmerPatch(monitor, modHelper).Apply(harmony);
 
                 // Apply object related patches
+                new ItemPatch(monitor, modHelper).Apply(harmony);
                 new ObjectPatch(monitor, modHelper).Apply(harmony);
                 new ColoredObjectPatch(monitor, modHelper).Apply(harmony);
+                new MannequinPatch(monitor, modHelper).Apply(harmony);
+
+                // Apply clothing related patches
+                new ClothingPatch(monitor, modHelper).Apply(harmony);
 
                 // Apply core related patches
                 new GamePatch(monitor, modHelper).Apply(harmony);
@@ -148,6 +158,7 @@ namespace FashionSense
             helper.Events.Content.AssetRequested += OnAssetRequested;
             helper.Events.Content.AssetsInvalidated += OnAssetInvalidated;
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+            helper.Events.Input.ButtonPressed += OnButtonPressed;
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
             helper.Events.GameLoop.DayStarted += OnDayStarted;
             helper.Events.Player.Warped += OnWarped;
@@ -194,7 +205,7 @@ namespace FashionSense
                 // Update elapsed durations for the player
                 foreach (var farmer in Game1.getAllFarmers())
                 {
-                    UpdateElapsedDuration(farmer);
+                    FashionSense.UpdateElapsedDuration(farmer);
 
                     // Update movement trackers
                     conditionData.Update(farmer, Game1.currentGameTime);
@@ -206,7 +217,7 @@ namespace FashionSense
             {
                 foreach (var fakeFarmer in searchMenu.fakeFarmers)
                 {
-                    UpdateElapsedDuration(fakeFarmer);
+                    FashionSense.UpdateElapsedDuration(fakeFarmer);
                 }
             }
 
@@ -222,7 +233,7 @@ namespace FashionSense
             // Remove old lights
             foreach (var animationData in animationManager.GetAllAnimationData(e.Player).Where(a => string.IsNullOrEmpty(a.LightId) is false))
             {
-                e.OldLocation.sharedLights.Remove(animationData.LightId);
+                e.OldLocation.sharedLights.Remove(animationData.LightId.Value);
             }
         }
 
@@ -234,8 +245,33 @@ namespace FashionSense
                 apiManager.GetContentPatcherApi().RegisterToken(ModManifest, "Appearance", new AppearanceToken());
             }
 
+            if (Helper.ModRegistry.IsLoaded("spacechase0.GenericModConfigMenu") && apiManager.HookIntoGenericModConfigMenu(Helper))
+            {
+                apiManager.RegisterGenericModConfigMenu(Helper, ModManifest);
+            }
+
             // Load any owned content packs
             this.LoadContentPacks();
+        }
+
+        private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
+        {
+            if (Context.IsWorldReady is false || Game1.activeClickableMenu is not null || Game1.player is null)
+            {
+                return;
+            }
+
+            if (e.Button == modConfig.QuickMenuKey)
+            {
+                if (modConfig.RequireHandMirrorInInventory && Game1.player.Items.Any(i => i is not null && i.modData is not null && i.modData.ContainsKey(ModDataKeys.HAND_MIRROR_FLAG)) is false)
+                {
+                    Game1.addHUDMessage(new HUDMessage(Helper.Translation.Get("messages.warning.requires_hand_mirror"), 3));
+                }
+                else
+                {
+                    Game1.activeClickableMenu = new HandMirrorMenu();
+                }
+            }
         }
 
         private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
@@ -248,22 +284,153 @@ namespace FashionSense
                     data[ModDataKeys.LETTER_HAND_MIRROR] = modHelper.Translation.Get("letters.hand_mirror");
                 });
             }
-            else if (e.NameWithoutLocale.IsEquivalentTo("Data/PeacefulEnd/FashionSense/AppearanceData"))
+            else if (e.NameWithoutLocale.IsEquivalentTo("Data/Hats"))
             {
-                e.LoadFrom(() => textureManager.GetIdToAppearanceModels(), AssetLoadPriority.High);
+                e.Edit(asset =>
+                {
+                    var data = asset.AsDictionary<string, string>().Data;
+                    foreach (var hatModel in textureManager.GetAllAppearanceModels<HatContentPack>().Where(s => s.Item is not null))
+                    {
+                        data[hatModel.Item.Id] = $"{hatModel.Item.DisplayName}/{hatModel.Item.Description}/false/true//{hatModel.Item.DisplayName}";
+                    }
+                });
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo("Data/Shirts"))
+            {
+                e.Edit(asset =>
+                {
+                    var data = asset.AsDictionary<string, ShirtData>().Data;
+                    foreach (var shirtModel in textureManager.GetAllAppearanceModels<ShirtContentPack>().Where(s => s.Item is not null))
+                    {
+                        data[shirtModel.Item.Id] = new ShirtData()
+                        {
+                            DisplayName = shirtModel.Item.DisplayName,
+                            Description = shirtModel.Item.Description,
+                            Price = shirtModel.Item.Price
+                        };
+                    }
+                });
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo("Data/Pants"))
+            {
+                e.Edit(asset =>
+                {
+                    var data = asset.AsDictionary<string, PantsData>().Data;
+                    foreach (var pantsModel in textureManager.GetAllAppearanceModels<PantsContentPack>().Where(s => s.Item is not null))
+                    {
+                        data[pantsModel.Item.Id] = new PantsData()
+                        {
+                            DisplayName = pantsModel.Item.DisplayName,
+                            Description = pantsModel.Item.Description,
+                            Price = pantsModel.Item.Price
+                        };
+                    }
+                });
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo("Data/Boots"))
+            {
+                e.Edit(asset =>
+                {
+                    var data = asset.AsDictionary<string, string>().Data;
+                    foreach (var shoesModel in textureManager.GetAllAppearanceModels<ShoesContentPack>().Where(s => s.Item is not null))
+                    {
+                        data[shoesModel.Item.Id] = $"{shoesModel.Item.DisplayName}/{shoesModel.Item.Description}/{shoesModel.Item.Price}/0/0/0/{shoesModel.Item.DisplayName}";
+                    }
+                });
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo($"Data/PeacefulEnd/FashionSense/AppearanceData"))
+            {
+                e.LoadFrom(() => textureManager.GetIdToAppearanceModels<AppearanceContentPack>(), AssetLoadPriority.High);
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo($"Data/PeacefulEnd/FashionSense/AccessoryData"))
+            {
+                e.LoadFrom(() => textureManager.GetIdToAppearanceModels<AccessoryContentPack>(), AssetLoadPriority.High);
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo($"Data/PeacefulEnd/FashionSense/HatData"))
+            {
+                e.LoadFrom(() => textureManager.GetIdToAppearanceModels<HatContentPack>(), AssetLoadPriority.High);
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo($"Data/PeacefulEnd/FashionSense/HairData"))
+            {
+                e.LoadFrom(() => textureManager.GetIdToAppearanceModels<HairContentPack>(), AssetLoadPriority.High);
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo($"Data/PeacefulEnd/FashionSense/ShirtData"))
+            {
+                e.LoadFrom(() => textureManager.GetIdToAppearanceModels<ShirtContentPack>(), AssetLoadPriority.High);
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo($"Data/PeacefulEnd/FashionSense/SleevesData"))
+            {
+                e.LoadFrom(() => textureManager.GetIdToAppearanceModels<SleevesContentPack>(), AssetLoadPriority.High);
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo($"Data/PeacefulEnd/FashionSense/PantsData"))
+            {
+                e.LoadFrom(() => textureManager.GetIdToAppearanceModels<PantsContentPack>(), AssetLoadPriority.High);
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo($"Data/PeacefulEnd/FashionSense/ShoesData"))
+            {
+                e.LoadFrom(() => textureManager.GetIdToAppearanceModels<ShoesContentPack>(), AssetLoadPriority.High);
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo($"Data/PeacefulEnd/FashionSense/BodyData"))
+            {
+                e.LoadFrom(() => textureManager.GetIdToAppearanceModels<BodyContentPack>(), AssetLoadPriority.High);
             }
         }
 
         private void OnAssetInvalidated(object sender, AssetsInvalidatedEventArgs e)
         {
-            var asset = e.NamesWithoutLocale.FirstOrDefault(a => a.IsEquivalentTo("Data/PeacefulEnd/FashionSense/AppearanceData"));
-            if (asset is null)
+            var appearanceDataAsset = e.NamesWithoutLocale.FirstOrDefault(a => a.IsEquivalentTo("Data/PeacefulEnd/FashionSense/AppearanceData"));
+            if (appearanceDataAsset is not null)
             {
-                return;
+                textureManager.Sync(Helper.GameContent.Load<Dictionary<string, AppearanceContentPack>>(appearanceDataAsset));
             }
 
-            // Force load the changes
-            _ = Helper.GameContent.Load<Dictionary<string, AppearanceContentPack>>(asset);
+            var accessoryDataAsset = e.NamesWithoutLocale.FirstOrDefault(a => a.IsEquivalentTo("Data/PeacefulEnd/FashionSense/AccessoryData"));
+            if (accessoryDataAsset is not null)
+            {
+                textureManager.Sync(Helper.GameContent.Load<Dictionary<string, AccessoryContentPack>>(accessoryDataAsset), IApi.Type.Accessory);
+            }
+
+            var hatDataAsset = e.NamesWithoutLocale.FirstOrDefault(a => a.IsEquivalentTo("Data/PeacefulEnd/FashionSense/HatData"));
+            if (hatDataAsset is not null)
+            {
+                textureManager.Sync(Helper.GameContent.Load<Dictionary<string, HatContentPack>>(hatDataAsset), IApi.Type.Hat);
+            }
+
+            var hairDataAsset = e.NamesWithoutLocale.FirstOrDefault(a => a.IsEquivalentTo("Data/PeacefulEnd/FashionSense/HairData"));
+            if (hairDataAsset is not null)
+            {
+                textureManager.Sync(Helper.GameContent.Load<Dictionary<string, HairContentPack>>(hairDataAsset), IApi.Type.Hair);
+            }
+
+            var shirtDataAsset = e.NamesWithoutLocale.FirstOrDefault(a => a.IsEquivalentTo("Data/PeacefulEnd/FashionSense/ShirtData"));
+            if (shirtDataAsset is not null)
+            {
+                textureManager.Sync(Helper.GameContent.Load<Dictionary<string, ShirtContentPack>>(shirtDataAsset), IApi.Type.Shirt);
+            }
+
+            var sleevesDataAsset = e.NamesWithoutLocale.FirstOrDefault(a => a.IsEquivalentTo("Data/PeacefulEnd/FashionSense/SleevesData"));
+            if (sleevesDataAsset is not null)
+            {
+                textureManager.Sync(Helper.GameContent.Load<Dictionary<string, SleevesContentPack>>(sleevesDataAsset), IApi.Type.Sleeves);
+            }
+
+            var pantsDataAsset = e.NamesWithoutLocale.FirstOrDefault(a => a.IsEquivalentTo("Data/PeacefulEnd/FashionSense/PantsData"));
+            if (pantsDataAsset is not null)
+            {
+                textureManager.Sync(Helper.GameContent.Load<Dictionary<string, PantsContentPack>>(pantsDataAsset), IApi.Type.Pants);
+            }
+
+            var shoesDataAsset = e.NamesWithoutLocale.FirstOrDefault(a => a.IsEquivalentTo("Data/PeacefulEnd/FashionSense/ShoesData"));
+            if (shoesDataAsset is not null)
+            {
+                textureManager.Sync(Helper.GameContent.Load<Dictionary<string, ShoesContentPack>>(shoesDataAsset), IApi.Type.Shoes);
+            }
+
+            var bodyDataAsset = e.NamesWithoutLocale.FirstOrDefault(a => a.IsEquivalentTo("Data/PeacefulEnd/FashionSense/BodyData"));
+            if (bodyDataAsset is not null)
+            {
+                textureManager.Sync(Helper.GameContent.Load<Dictionary<string, BodyContentPack>>(bodyDataAsset), IApi.Type.Player);
+            }
         }
 
         private void OnSaveLoaded(object sender, StardewModdingAPI.Events.SaveLoadedEventArgs e)
@@ -319,10 +486,19 @@ namespace FashionSense
             LoadCachedAccessories(Game1.player);
 
             // Set sprite to dirty in order to refresh sleeves and other tied-in appearances
-            SetSpriteDirty();
+            SetSpriteDirty(Game1.player);
 
             // Load our Data/PeacefulEnd/FashionSense/AppearanceData
-            _ = Helper.GameContent.Load<Dictionary<string, AppearanceContentPack>>("Data/PeacefulEnd/FashionSense/AppearanceData");
+            textureManager.Sync(Helper.GameContent.Load<Dictionary<string, AppearanceContentPack>>("Data/PeacefulEnd/FashionSense/AppearanceData"));
+
+            textureManager.Sync(Helper.GameContent.Load<Dictionary<string, AccessoryContentPack>>("Data/PeacefulEnd/FashionSense/AccessoryData"), IApi.Type.Accessory);
+            textureManager.Sync(Helper.GameContent.Load<Dictionary<string, HatContentPack>>("Data/PeacefulEnd/FashionSense/HatData"), IApi.Type.Hat);
+            textureManager.Sync(Helper.GameContent.Load<Dictionary<string, HairContentPack>>("Data/PeacefulEnd/FashionSense/HairData"), IApi.Type.Hair);
+            textureManager.Sync(Helper.GameContent.Load<Dictionary<string, ShirtContentPack>>("Data/PeacefulEnd/FashionSense/ShirtData"), IApi.Type.Shirt);
+            textureManager.Sync(Helper.GameContent.Load<Dictionary<string, SleevesContentPack>>("Data/PeacefulEnd/FashionSense/SleevesData"), IApi.Type.Sleeves);
+            textureManager.Sync(Helper.GameContent.Load<Dictionary<string, PantsContentPack>>("Data/PeacefulEnd/FashionSense/PantsData"), IApi.Type.Pants);
+            textureManager.Sync(Helper.GameContent.Load<Dictionary<string, ShoesContentPack>>("Data/PeacefulEnd/FashionSense/ShoesData"), IApi.Type.Shoes);
+            textureManager.Sync(Helper.GameContent.Load<Dictionary<string, BodyContentPack>>("Data/PeacefulEnd/FashionSense/BodyData"), IApi.Type.Player);
 
             // Check if we need to give a Hand Mirror at the start of the game
             if (SDate.Now().DaysSinceStart == 1 && Game1.player.modData.ContainsKey(ModDataKeys.STARTS_WITH_HAND_MIRROR))
@@ -373,18 +549,6 @@ namespace FashionSense
                 Game1.player.FarmerSprite.setCurrentFrame(_recordedPlayerFrames[_currentRecordedPlayerFrameIndex]);
 
                 Monitor.Log($"Playing frame {_recordedPlayerFrames[_currentRecordedPlayerFrameIndex]}", LogLevel.Debug);
-            }
-        }
-
-        private void UpdateElapsedDuration(Farmer who)
-        {
-            foreach (var animationData in animationManager.GetAllAnimationData(who))
-            {
-                var elapsedDuration = animationData.ElapsedDuration;
-                if (elapsedDuration < MAX_TRACKED_MILLISECONDS)
-                {
-                    animationData.ElapsedDuration = (elapsedDuration + Game1.currentGameTime.ElapsedGameTime.Milliseconds);
-                }
             }
         }
 
@@ -447,6 +611,7 @@ namespace FashionSense
                     Owner = "PeacefulEnd",
                     Name = modHelper.Translation.Get("ui.fashion_sense.color_override.shoes"),
                     PackType = IApi.Type.Shoes,
+                    PackId = ModDataKeys.INTERNAL_COLOR_OVERRIDE_SHOE_ID,
                     PackName = modHelper.Translation.Get("ui.fashion_sense.color_override.shoes"),
                     Id = ModDataKeys.INTERNAL_COLOR_OVERRIDE_SHOE_ID,
                     FrontShoes = new ShoesModel(),
@@ -466,6 +631,7 @@ namespace FashionSense
                     Owner = "PeacefulEnd",
                     Name = modHelper.Translation.Get("ui.fashion_sense.color_override.body"),
                     PackType = IApi.Type.Player,
+                    PackId = ModDataKeys.INTERNAL_COLOR_OVERRIDE_BODY_ID,
                     PackName = modHelper.Translation.Get("ui.fashion_sense.color_override.body"),
                     Id = ModDataKeys.INTERNAL_COLOR_OVERRIDE_BODY_ID,
                     FrontBody = new BodyModel(),
@@ -509,22 +675,37 @@ namespace FashionSense
 
             if (Context.IsWorldReady)
             {
-                SetSpriteDirty();
+                SetSpriteDirty(Game1.player);
             }
+        }
+
+        private static DirectoryInfo GetContentPackDirectory(IContentPack contentPack, string targetDirectoryName)
+        {
+            var contentPackDirectory = new DirectoryInfo(contentPack.DirectoryPath);
+
+            foreach (var directory in contentPackDirectory.GetDirectories())
+            {
+                if (directory.Name.Equals(targetDirectoryName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return directory;
+                }
+            }
+
+            return new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, targetDirectoryName));
         }
 
         private void AddHairContentPacks(IContentPack contentPack)
         {
             try
             {
-                var directoryPath = new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, "Hairs"));
+                var directoryPath = GetContentPackDirectory(contentPack, "Hairs");
                 if (!directoryPath.Exists)
                 {
                     Monitor.Log($"No Hairs folder found for the content pack {contentPack.Manifest.Name}", LogLevel.Trace);
                     return;
                 }
 
-                var hairFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories);
+                var hairFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories).OrderBy(d => d.Name);
                 if (hairFolders.Count() == 0)
                 {
                     Monitor.Log($"No sub-folders found under Hairs for the content pack {contentPack.Manifest.Name}", LogLevel.Warn);
@@ -549,6 +730,7 @@ namespace FashionSense
 
                     // Parse the model and assign it the content pack's owner
                     HairContentPack appearanceModel = contentPack.ReadJsonFile<HairContentPack>(modelPath);
+                    appearanceModel.IsLocalPack = true;
                     appearanceModel.Author = contentPack.Manifest.Author;
                     appearanceModel.Owner = contentPack.Manifest.UniqueID;
 
@@ -633,14 +815,14 @@ namespace FashionSense
         {
             try
             {
-                var directoryPath = new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, "Accessories"));
+                var directoryPath = GetContentPackDirectory(contentPack, "Accessories");
                 if (!directoryPath.Exists)
                 {
                     Monitor.Log($"No Accessories folder found for the content pack {contentPack.Manifest.Name}", LogLevel.Trace);
                     return;
                 }
 
-                var accessoryFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories);
+                var accessoryFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories).OrderBy(d => d.Name);
                 if (accessoryFolders.Count() == 0)
                 {
                     Monitor.Log($"No sub-folders found under Accessories for the content pack {contentPack.Manifest.Name}", LogLevel.Warn);
@@ -665,6 +847,7 @@ namespace FashionSense
 
                     // Parse the model and assign it the content pack's owner
                     AccessoryContentPack appearanceModel = contentPack.ReadJsonFile<AccessoryContentPack>(modelPath);
+                    appearanceModel.IsLocalPack = true;
                     appearanceModel.Author = contentPack.Manifest.Author;
                     appearanceModel.Owner = contentPack.Manifest.UniqueID;
 
@@ -749,14 +932,14 @@ namespace FashionSense
         {
             try
             {
-                var directoryPath = new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, "Hats"));
+                var directoryPath = GetContentPackDirectory(contentPack, "Hats");
                 if (!directoryPath.Exists)
                 {
                     Monitor.Log($"No Hats folder found for the content pack {contentPack.Manifest.Name}", LogLevel.Trace);
                     return;
                 }
 
-                var hatFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories);
+                var hatFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories).OrderBy(d => d.Name);
                 if (hatFolders.Count() == 0)
                 {
                     Monitor.Log($"No sub-folders found under Hats for the content pack {contentPack.Manifest.Name}", LogLevel.Warn);
@@ -781,6 +964,7 @@ namespace FashionSense
 
                     // Parse the model and assign it the content pack's owner
                     HatContentPack appearanceModel = contentPack.ReadJsonFile<HatContentPack>(modelPath);
+                    appearanceModel.IsLocalPack = true;
                     appearanceModel.Author = contentPack.Manifest.Author;
                     appearanceModel.Owner = contentPack.Manifest.UniqueID;
 
@@ -842,6 +1026,18 @@ namespace FashionSense
                         continue;
                     }
 
+                    // Handle ItemModel, if given
+                    if (appearanceModel.Item is not null)
+                    {
+                        if (appearanceModel.Item.IsValid() is false)
+                        {
+                            Monitor.Log($"Unable to add hat for {appearanceModel.Name} from {contentPack.Manifest.Name}: Invalid Item property. Ensure that SpritePosition and SpriteSize are given.", LogLevel.Warn);
+                            continue;
+                        }
+
+                        appearanceModel.SetItemData();
+                    }
+
                     // Load in the texture
                     appearanceModel.Texture = contentPack.ModContent.Load<Texture2D>(contentPack.ModContent.GetInternalAssetName(Path.Combine(parentFolderName, textureFolder.Name, "hat.png")).Name);
 
@@ -865,14 +1061,14 @@ namespace FashionSense
         {
             try
             {
-                var directoryPath = new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, "Shirts"));
+                var directoryPath = GetContentPackDirectory(contentPack, "Shirts");
                 if (!directoryPath.Exists)
                 {
                     Monitor.Log($"No Shirts folder found for the content pack {contentPack.Manifest.Name}", LogLevel.Trace);
                     return;
                 }
 
-                var shirtFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories);
+                var shirtFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories).OrderBy(d => d.Name);
                 if (shirtFolders.Count() == 0)
                 {
                     Monitor.Log($"No sub-folders found under Shirts for the content pack {contentPack.Manifest.Name}", LogLevel.Warn);
@@ -897,6 +1093,7 @@ namespace FashionSense
 
                     // Parse the model and assign it the content pack's owner
                     ShirtContentPack appearanceModel = contentPack.ReadJsonFile<ShirtContentPack>(modelPath);
+                    appearanceModel.IsLocalPack = true;
                     appearanceModel.Author = contentPack.Manifest.Author;
                     appearanceModel.Owner = contentPack.Manifest.UniqueID;
 
@@ -958,6 +1155,18 @@ namespace FashionSense
                         continue;
                     }
 
+                    // Handle ItemModel, if given
+                    if (appearanceModel.Item is not null)
+                    {
+                        if (appearanceModel.Item.IsValid() is false)
+                        {
+                            Monitor.Log($"Unable to add shirt for {appearanceModel.Name} from {contentPack.Manifest.Name}: Invalid Item property. Ensure that SpritePosition and SpriteSize are given.", LogLevel.Warn);
+                            continue;
+                        }
+
+                        appearanceModel.SetItemData();
+                    }
+
                     // Load in the texture
                     appearanceModel.Texture = contentPack.ModContent.Load<Texture2D>(contentPack.ModContent.GetInternalAssetName(Path.Combine(parentFolderName, textureFolder.Name, "shirt.png")).Name);
 
@@ -981,14 +1190,14 @@ namespace FashionSense
         {
             try
             {
-                var directoryPath = new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, "Pants"));
+                var directoryPath = GetContentPackDirectory(contentPack, "Pants");
                 if (!directoryPath.Exists)
                 {
                     Monitor.Log($"No Pants folder found for the content pack {contentPack.Manifest.Name}", LogLevel.Trace);
                     return;
                 }
 
-                var pantsFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories);
+                var pantsFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories).OrderBy(d => d.Name);
                 if (pantsFolders.Count() == 0)
                 {
                     Monitor.Log($"No sub-folders found under Pants for the content pack {contentPack.Manifest.Name}", LogLevel.Warn);
@@ -1013,6 +1222,7 @@ namespace FashionSense
 
                     // Parse the model and assign it the content pack's owner
                     PantsContentPack appearanceModel = contentPack.ReadJsonFile<PantsContentPack>(modelPath);
+                    appearanceModel.IsLocalPack = true;
                     appearanceModel.Author = contentPack.Manifest.Author;
                     appearanceModel.Owner = contentPack.Manifest.UniqueID;
 
@@ -1074,6 +1284,18 @@ namespace FashionSense
                         continue;
                     }
 
+                    // Handle ItemModel, if given
+                    if (appearanceModel.Item is not null)
+                    {
+                        if (appearanceModel.Item.IsValid() is false)
+                        {
+                            Monitor.Log($"Unable to add pants for {appearanceModel.Name} from {contentPack.Manifest.Name}: Invalid Item property. Ensure that SpritePosition and SpriteSize are given.", LogLevel.Warn);
+                            continue;
+                        }
+
+                        appearanceModel.SetItemData();
+                    }
+
                     // Load in the texture
                     appearanceModel.Texture = contentPack.ModContent.Load<Texture2D>(contentPack.ModContent.GetInternalAssetName(Path.Combine(parentFolderName, textureFolder.Name, "pants.png")).Name);
 
@@ -1097,14 +1319,14 @@ namespace FashionSense
         {
             try
             {
-                var directoryPath = new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, "Sleeves"));
+                var directoryPath = GetContentPackDirectory(contentPack, "Sleeves");
                 if (!directoryPath.Exists)
                 {
                     Monitor.Log($"No Sleeves folder found for the content pack {contentPack.Manifest.Name}", LogLevel.Trace);
                     return;
                 }
 
-                var sleevesFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories);
+                var sleevesFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories).OrderBy(d => d.Name);
                 if (sleevesFolders.Count() == 0)
                 {
                     Monitor.Log($"No sub-folders found under Sleeves for the content pack {contentPack.Manifest.Name}", LogLevel.Warn);
@@ -1129,6 +1351,7 @@ namespace FashionSense
 
                     // Parse the model and assign it the content pack's owner
                     SleevesContentPack appearanceModel = contentPack.ReadJsonFile<SleevesContentPack>(modelPath);
+                    appearanceModel.IsLocalPack = true;
                     appearanceModel.Author = contentPack.Manifest.Author;
                     appearanceModel.Owner = contentPack.Manifest.UniqueID;
 
@@ -1213,14 +1436,14 @@ namespace FashionSense
         {
             try
             {
-                var directoryPath = new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, "Shoes"));
+                var directoryPath = GetContentPackDirectory(contentPack, "Shoes");
                 if (!directoryPath.Exists)
                 {
                     Monitor.Log($"No Shoes folder found for the content pack {contentPack.Manifest.Name}", LogLevel.Trace);
                     return;
                 }
 
-                var shoesFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories);
+                var shoesFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories).OrderBy(d => d.Name);
                 if (shoesFolders.Count() == 0)
                 {
                     Monitor.Log($"No sub-folders found under Shoes for the content pack {contentPack.Manifest.Name}", LogLevel.Warn);
@@ -1245,6 +1468,7 @@ namespace FashionSense
 
                     // Parse the model and assign it the content pack's owner
                     ShoesContentPack appearanceModel = contentPack.ReadJsonFile<ShoesContentPack>(modelPath);
+                    appearanceModel.IsLocalPack = true;
                     appearanceModel.Author = contentPack.Manifest.Author;
                     appearanceModel.Owner = contentPack.Manifest.UniqueID;
 
@@ -1306,6 +1530,18 @@ namespace FashionSense
                         continue;
                     }
 
+                    // Handle ItemModel, if given
+                    if (appearanceModel.Item is not null)
+                    {
+                        if (appearanceModel.Item.IsValid() is false)
+                        {
+                            Monitor.Log($"Unable to add shoes for {appearanceModel.Name} from {contentPack.Manifest.Name}: Invalid Item property. Ensure that SpritePosition and SpriteSize are given.", LogLevel.Warn);
+                            continue;
+                        }
+
+                        appearanceModel.SetItemData();
+                    }
+
                     // Load in the texture
                     appearanceModel.Texture = contentPack.ModContent.Load<Texture2D>(contentPack.ModContent.GetInternalAssetName(Path.Combine(parentFolderName, textureFolder.Name, "shoes.png")).Name);
 
@@ -1329,14 +1565,14 @@ namespace FashionSense
         {
             try
             {
-                var directoryPath = new DirectoryInfo(Path.Combine(contentPack.DirectoryPath, "Bodies"));
+                var directoryPath = GetContentPackDirectory(contentPack, "Bodies");
                 if (!directoryPath.Exists)
                 {
                     Monitor.Log($"No Bodies folder found for the content pack {contentPack.Manifest.Name}", LogLevel.Trace);
                     return;
                 }
 
-                var bodiesFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories);
+                var bodiesFolders = directoryPath.GetDirectories("*", SearchOption.AllDirectories).OrderBy(d => d.Name);
                 if (bodiesFolders.Count() == 0)
                 {
                     Monitor.Log($"No sub-folders found under Bodies for the content pack {contentPack.Manifest.Name}", LogLevel.Warn);
@@ -1361,6 +1597,7 @@ namespace FashionSense
 
                     // Parse the model and assign it the content pack's owner
                     BodyContentPack appearanceModel = contentPack.ReadJsonFile<BodyContentPack>(modelPath);
+                    appearanceModel.IsLocalPack = true;
                     appearanceModel.Author = contentPack.Manifest.Author;
                     appearanceModel.Owner = contentPack.Manifest.UniqueID;
 
@@ -1451,6 +1688,18 @@ namespace FashionSense
             }
         }
 
+        internal static void UpdateElapsedDuration(Farmer who)
+        {
+            foreach (var animationData in animationManager.GetAllAnimationData(who))
+            {
+                var elapsedDuration = animationData.ElapsedDuration;
+                if (elapsedDuration < MAX_TRACKED_MILLISECONDS)
+                {
+                    animationData.ElapsedDuration = (elapsedDuration + Game1.currentGameTime.ElapsedGameTime.Milliseconds);
+                }
+            }
+        }
+
         internal static void SetCachedColor(string oldColorKey, IApi.Type type, int appearanceIndex)
         {
             var actualColorKey = AppearanceModel.GetColorKey(type, appearanceIndex);
@@ -1467,15 +1716,15 @@ namespace FashionSense
             colorManager.SetColor(Game1.player, actualColorKey, Game1.player.modData[actualColorKey]);
         }
 
-        internal static void SetSpriteDirty(bool skipColorMaskRefresh = false)
+        internal static void SetSpriteDirty(Farmer who, bool skipColorMaskRefresh = false)
         {
-            var spriteDirty = modHelper.Reflection.GetField<bool>(Game1.player.FarmerRenderer, "_spriteDirty");
+            var spriteDirty = modHelper.Reflection.GetField<bool>(who.FarmerRenderer, "_spriteDirty");
             spriteDirty.SetValue(true);
-            var shirtDirty = modHelper.Reflection.GetField<bool>(Game1.player.FarmerRenderer, "_shirtDirty");
+            var shirtDirty = modHelper.Reflection.GetField<bool>(who.FarmerRenderer, "_shirtDirty");
             shirtDirty.SetValue(true);
-            var shoeDirty = modHelper.Reflection.GetField<bool>(Game1.player.FarmerRenderer, "_shoesDirty");
+            var shoeDirty = modHelper.Reflection.GetField<bool>(who.FarmerRenderer, "_shoesDirty");
             shoeDirty.SetValue(true);
-            var skinDirty = modHelper.Reflection.GetField<bool>(Game1.player.FarmerRenderer, "_skinDirty");
+            var skinDirty = modHelper.Reflection.GetField<bool>(who.FarmerRenderer, "_skinDirty");
             skinDirty.SetValue(true);
 
             if (skipColorMaskRefresh is false)

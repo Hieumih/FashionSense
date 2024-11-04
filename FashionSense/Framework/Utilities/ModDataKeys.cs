@@ -34,6 +34,7 @@
         // Outfit related keys
         internal const string OUTFITS = "FashionSense.Outfit.Collection";
         internal const string CURRENT_OUTFIT_ID = "FashionSense.Outfit.CurrentId";
+        internal const string MANNEQUIN_OUTFIT_DATA = "FashionSense.Outfit.Mannequin.Data";
 
         // Etc
         internal const string STARTS_WITH_HAND_MIRROR = "FashionSense.StartsWithHandMirror";

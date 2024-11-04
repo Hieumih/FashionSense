@@ -46,7 +46,7 @@ namespace FashionSense.Framework.Patches.Renderer
             bool hasDrawnCustomBody = false;
             BodyModel customBody = null;
             Vector2 portraitOffset = Vector2.Zero;
-            if (who.modData.ContainsKey(ModDataKeys.CUSTOM_BODY_ID) && FashionSense.textureManager.GetSpecificAppearanceModel<BodyContentPack>(who.modData[ModDataKeys.CUSTOM_BODY_ID]) is BodyContentPack bodyPack && bodyPack is not null && bodyPack.FrontBody is BodyModel bodyModel && bodyModel is not null && bodyModel.StartingPosition is not null)
+            if (who.modData.ContainsKey(ModDataKeys.CUSTOM_BODY_ID) && FashionSense.textureManager.GetSpecificAppearanceModel<BodyContentPack>(who.modData[ModDataKeys.CUSTOM_BODY_ID]) is BodyContentPack bodyPack && bodyPack is not null && bodyPack.Texture is not null && bodyPack.FrontBody is BodyModel bodyModel && bodyModel is not null && bodyModel.StartingPosition is not null)
             {
                 FashionSense.monitor.LogOnce($"Using custom body {bodyPack.Name} from {bodyPack.PackName} for profile draw!", LogLevel.Trace);
                 customBody = bodyModel;

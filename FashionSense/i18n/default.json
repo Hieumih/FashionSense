@@ -1,9 +1,22 @@
 {
+  // Config
+  "config.general.title": "Fashion Sense",
+  "config.general.require_hand_mirror.name": "Require Hand Mirror",
+  "config.general.require_hand_mirror.description": "When enabled, the Hand Mirror shortcut requires the Hand Mirror to be in the player's inventory.",
+  "config.general.shortcut_key.name": "Hand Mirror Shortcut Key",
+  "config.general.shortcut_key.description": "When this key is pressed, the Hand Mirror menu will appear.",
+  "config.general.allow_mannequin_animations.name": "Allow Mannequin Animations",
+  "config.general.allow_mannequin_animations.description": "When enabled, mannequins with Fashion Sense appearances will play their animations.",
+
   // Tools
   "tools.name.hand_mirror": "Hand Mirror",
   "tools.description.hand_mirror": "Allows you to change your appearance into a more lively one.",
 
   // Messages
+  "messages.warning.mannequin_copied_appearance": "Copied outfit from mannequin!",
+  "messages.warning.mannequin_occupied": "The mannequin has clothing on it. Remove them to set the Fashion Sense appearance.",
+  "messages.warning.mannequin_using_fashion_sense": "The mannequin is using a Fashion Sense appearance. Shift click with the Hand Mirror to remove it.",
+  "messages.warning.requires_hand_mirror": "No Hand Mirror in inventory! Disable the RequireHandMirrorInInventory config setting to ignore this requirement.",
   "messages.warning.no_content_packs": "You don't have any Fashion Sense content packs installed!",
 
   // Letters

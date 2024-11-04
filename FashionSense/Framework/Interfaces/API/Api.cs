@@ -286,7 +286,7 @@ namespace FashionSense.Framework.Interfaces.API
             }
 
             Game1.player.modData[modDataKey] = appearanceId;
-            FashionSense.SetSpriteDirty();
+            FashionSense.SetSpriteDirty(Game1.player);
 
             return true;
         }
@@ -341,7 +341,7 @@ namespace FashionSense.Framework.Interfaces.API
                     SetAccessorySlot(appearanceId, 2);
                 }
 
-                FashionSense.SetSpriteDirty();
+                FashionSense.SetSpriteDirty(Game1.player);
             }
             else if (SetFarmerAppearance(appearanceId, packType) is false)
             {
@@ -396,7 +396,7 @@ namespace FashionSense.Framework.Interfaces.API
             }
 
             _accessoryManager.AddAccessory(Game1.player, accessoryId, accessorySlot, preserveColor: true);
-            FashionSense.SetSpriteDirty();
+            FashionSense.SetSpriteDirty(Game1.player);
 
             return GenerateResponsePair(true, $"Set farmer's accessory slot ({accessorySlot}) to accessory {accessoryId}.");
         }
@@ -509,7 +509,7 @@ namespace FashionSense.Framework.Interfaces.API
             }
 
             _accessoryManager.RemoveAccessory(Game1.player, accessorySlot);
-            FashionSense.SetSpriteDirty();
+            FashionSense.SetSpriteDirty(Game1.player);
 
             return GenerateResponsePair(true, $"Cleared farmer's accessory slot ({accessorySlot}).");
         }

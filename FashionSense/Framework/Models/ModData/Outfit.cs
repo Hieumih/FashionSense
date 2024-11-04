@@ -72,9 +72,18 @@ namespace FashionSense.Framework.Models
             Version = _latestVersion;
 
             HairId = who.modData[ModDataKeys.CUSTOM_HAIR_ID];
-            AccessoryOneId = who.modData[ModDataKeys.CUSTOM_ACCESSORY_ID];
-            AccessoryTwoId = who.modData[ModDataKeys.CUSTOM_ACCESSORY_SECONDARY_ID];
-            AccessoryThreeId = who.modData[ModDataKeys.CUSTOM_ACCESSORY_TERTIARY_ID];
+            if (who.modData.ContainsKey(ModDataKeys.CUSTOM_ACCESSORY_ID))
+            {
+                AccessoryOneId = who.modData[ModDataKeys.CUSTOM_ACCESSORY_ID];
+            }
+            if (who.modData.ContainsKey(ModDataKeys.CUSTOM_ACCESSORY_SECONDARY_ID))
+            {
+                AccessoryTwoId = who.modData[ModDataKeys.CUSTOM_ACCESSORY_SECONDARY_ID];
+            }
+            if (who.modData.ContainsKey(ModDataKeys.CUSTOM_ACCESSORY_TERTIARY_ID))
+            {
+                AccessoryThreeId = who.modData[ModDataKeys.CUSTOM_ACCESSORY_TERTIARY_ID];
+            }
             AccessoryIds = FashionSense.accessoryManager.GetActiveAccessoryIds(who);
             HatId = who.modData[ModDataKeys.CUSTOM_HAT_ID];
             ShirtId = who.modData[ModDataKeys.CUSTOM_SHIRT_ID];
