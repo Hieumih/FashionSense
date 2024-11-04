@@ -485,7 +485,7 @@ namespace FashionSense.Framework.Utilities
             {
                 animationData.LightId = GenerateLightId(indexOffset);
 
-                if (animationData.LightId is null)
+                if (string.IsNullOrEmpty(animationData.LightId))
                 {
                     return;
                 }
@@ -494,38 +494,39 @@ namespace FashionSense.Framework.Utilities
             var lightModel = animationModel.Light;
             if (lightModel is null)
             {
-                if (Game1.currentLocation.sharedLights.ContainsKey(animationData.LightId.Value))
+                if (Game1.currentLocation.sharedLights.ContainsKey(animationData.LightId))
                 {
-                    Game1.currentLocation.sharedLights.Remove(animationData.LightId.Value);
+                    Game1.currentLocation.sharedLights.Remove(animationData.LightId);
                 }
                 return;
             }
 
             // Handle updating the position and other values of the light
-            if (!Game1.currentLocation.sharedLights.ContainsKey(animationData.LightId.Value))
+            if (!Game1.currentLocation.sharedLights.ContainsKey(animationData.LightId))
             {
-                Game1.currentLocation.sharedLights[animationData.LightId.Value] = new LightSource(lightModel.GetTextureSource(), who.Position - new Vector2(lightModel.Position.X, lightModel.Position.Y), lightModel.GetRadius(recalculateLight), lightModel.GetColor(), LightSource.LightContext.None);
+                Game1.currentLocation.sharedLights[animationData.LightId] = new LightSource(animationData.LightId, lightModel.GetTextureSource(), who.Position - new Vector2(lightModel.Position.X, lightModel.Position.Y), lightModel.GetRadius(recalculateLight), lightModel.GetColor(), LightSource.LightContext.None);
             }
             else
             {
-                Game1.currentLocation.sharedLights[animationData.LightId.Value].position.Value = who.Position - new Vector2(lightModel.Position.X, lightModel.Position.Y);
-                Game1.currentLocation.sharedLights[animationData.LightId.Value].radius.Value = lightModel.GetRadius(recalculateLight);
-                Game1.currentLocation.sharedLights[animationData.LightId.Value].color.Value = lightModel.GetColor();
+                Game1.currentLocation.sharedLights[animationData.LightId].position.Value = who.Position - new Vector2(lightModel.Position.X, lightModel.Position.Y);
+                Game1.currentLocation.sharedLights[animationData.LightId].radius.Value = lightModel.GetRadius(recalculateLight);
+                Game1.currentLocation.sharedLights[animationData.LightId].color.Value = lightModel.GetColor();
             }
         }
 
-        public static int? GenerateLightId(int offset)
+        public static string GenerateLightId(int offset)
         {
-            var baseKeyId = -1 * offset * 5000;
+            int baseKeyId = -1 * offset * 5000;
+            string actualKey = null;
             for (int x = 0; x < 100; x++)
             {
-                if (!Game1.currentLocation.sharedLights.ContainsKey(baseKeyId + x))
+                if (!Game1.currentLocation.sharedLights.ContainsKey($"FashionSense.Lights.Id.{baseKeyId + x}"))
                 {
-                    return baseKeyId + x;
+                    return $"FashionSense.Lights.Id.{baseKeyId + x}";
                 }
             }
 
-            return null;
+            return actualKey;
         }
 
         internal static bool AreSleevesForcedHidden(List<AppearanceMetadata> metadata)

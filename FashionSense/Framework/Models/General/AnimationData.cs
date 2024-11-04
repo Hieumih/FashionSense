@@ -9,7 +9,7 @@ namespace FashionSense.Framework.Models.General
         public int StartingIndex { get; set; }
         public int FrameDuration { get; set; }
         public int ElapsedDuration { get; set; }
-        public int? LightId { get; set; }
+        public string? LightId { get; set; }
         public int FarmerFrame { get; set; }
 
         internal void Reset(int frameDuration, int farmerFrame)

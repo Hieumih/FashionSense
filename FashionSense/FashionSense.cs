@@ -233,7 +233,7 @@ namespace FashionSense
             // Remove old lights
             foreach (var animationData in animationManager.GetAllAnimationData(e.Player).Where(a => string.IsNullOrEmpty(a.LightId) is false))
             {
-                e.OldLocation.sharedLights.Remove(animationData.LightId.Value);
+                e.OldLocation.sharedLights.Remove(animationData.LightId);
             }
         }
 

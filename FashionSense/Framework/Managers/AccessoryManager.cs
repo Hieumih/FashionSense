@@ -242,9 +242,9 @@ namespace FashionSense.Framework.Managers
             animationData.Reset(0, 0);
             animationData.StartingIndex = startingIndex;
 
-            if (animationData.LightId is not null && Game1.currentLocation.sharedLights.ContainsKey(animationData.LightId.Value))
+            if (animationData.LightId is not null && Game1.currentLocation.sharedLights.ContainsKey(animationData.LightId))
             {
-                Game1.currentLocation.sharedLights.Remove(animationData.LightId.Value);
+                Game1.currentLocation.sharedLights.Remove(animationData.LightId);
             }
             animationData.LightId = null;
         }
