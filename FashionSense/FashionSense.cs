@@ -231,7 +231,7 @@ namespace FashionSense
         private void OnWarped(object sender, StardewModdingAPI.Events.WarpedEventArgs e)
         {
             // Remove old lights
-            foreach (var animationData in animationManager.GetAllAnimationData(e.Player).Where(a => a.LightId is not null))
+            foreach (var animationData in animationManager.GetAllAnimationData(e.Player).Where(a => string.IsNullOrEmpty(a.LightId) is false))
             {
                 e.OldLocation.sharedLights.Remove(animationData.LightId.Value);
             }

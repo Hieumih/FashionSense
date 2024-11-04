@@ -826,7 +826,7 @@ namespace FashionSense.Framework.Utilities
                 }
                 else if (condition.Name is Condition.Type.ToolChargeLevel)
                 {
-                    passedCheck = condition.IsValid(who.toolPower) && who.UsingTool && (who.CurrentTool is Hoe || who.CurrentTool is Axe || who.CurrentTool is WateringCan);
+                    passedCheck = condition.IsValid(who.toolPower.Value) && who.UsingTool && (who.CurrentTool is Hoe || who.CurrentTool is Axe || who.CurrentTool is WateringCan);
                 }
                 else if (condition.Name is Condition.Type.IsUsingMilkPail)
                 {
@@ -970,7 +970,7 @@ namespace FashionSense.Framework.Utilities
                     dyed_shirt_source_rect = shirtSourceRect;
                     dyed_shirt_source_rect.Offset(128, 0);
 
-                    if ((int)who.accessory >= 0)
+                    if (who.accessory.Value >= 0)
                     {
                         accessorySourceRect.Offset(0, 16);
                     }
@@ -1002,7 +1002,7 @@ namespace FashionSense.Framework.Utilities
                         dyed_shirt_source_rect = shirtSourceRect;
                         dyed_shirt_source_rect.Offset(128, 0);
 
-                        if ((int)who.accessory >= 0)
+                        if (who.accessory.Value >= 0)
                         {
                             accessorySourceRect.Offset(0, 16);
                         }
