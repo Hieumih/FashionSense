@@ -614,10 +614,10 @@ namespace FashionSense
                     PackId = ModDataKeys.INTERNAL_COLOR_OVERRIDE_SHOE_ID,
                     PackName = modHelper.Translation.Get("ui.fashion_sense.color_override.shoes"),
                     Id = ModDataKeys.INTERNAL_COLOR_OVERRIDE_SHOE_ID,
-                    FrontShoes = new ShoesModel(),
-                    BackShoes = new ShoesModel(),
-                    LeftShoes = new ShoesModel(),
-                    RightShoes = new ShoesModel()
+                    FrontShoes = new ShoesModel() { ShoesSize = new Size() },
+                    BackShoes = new ShoesModel() { ShoesSize = new Size() },
+                    LeftShoes = new ShoesModel() { ShoesSize = new Size() },
+                    RightShoes = new ShoesModel() { ShoesSize = new Size() }
                 });
 
                 // Load Shoes
@@ -634,10 +634,10 @@ namespace FashionSense
                     PackId = ModDataKeys.INTERNAL_COLOR_OVERRIDE_BODY_ID,
                     PackName = modHelper.Translation.Get("ui.fashion_sense.color_override.body"),
                     Id = ModDataKeys.INTERNAL_COLOR_OVERRIDE_BODY_ID,
-                    FrontBody = new BodyModel(),
-                    BackBody = new BodyModel(),
-                    LeftBody = new BodyModel(),
-                    RightBody = new BodyModel()
+                    FrontBody = new BodyModel() { BodySize = new Size() },
+                    BackBody = new BodyModel() { BodySize = new Size() },
+                    LeftBody = new BodyModel() { BodySize = new Size() },
+                    RightBody = new BodyModel() { BodySize = new Size() }
                 });
 
                 // Load Bodies
