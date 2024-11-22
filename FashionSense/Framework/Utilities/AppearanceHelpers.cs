@@ -1214,6 +1214,13 @@ namespace FashionSense.Framework.Utilities
                 size = bodyModel.BodySize;
             }
 
+            // Verify that size is not null
+            if (size is null)
+            {
+                FashionSense.monitor.LogOnce($"{model.Pack.Id} is missing its required Size property, returning default!", StardewModdingAPI.LogLevel.Trace);
+                return new Size();
+            }
+
             return size;
         }
 
