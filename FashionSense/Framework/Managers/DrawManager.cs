@@ -722,7 +722,7 @@ namespace FashionSense.Framework.Managers
             {
                 List<Texture2D> textures = new List<Texture2D>()
                 {
-                    sleevesContentPack.ColorMaskTextures is not null ? sleevesContentPack.ColorMaskTextures[0] : null,
+                    sleevesContentPack.ColorMaskTextures is not null && sleevesContentPack.ColorMaskTextures.Count > 0 ? sleevesContentPack.ColorMaskTextures[0] : null,
                     sleevesContentPack.ShirtToneTexture is not null ? sleevesContentPack.ShirtToneTexture : null,
                     sleevesContentPack.SkinMaskTexture is not null ? sleevesContentPack.SkinMaskTexture : null
                 };
