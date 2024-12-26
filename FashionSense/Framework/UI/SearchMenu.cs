@@ -266,7 +266,7 @@ namespace FashionSense.Framework.UI
                 return;
             }
 
-            if (_searchFilterOptions.IsClicked && _searchFilterOptions.dropDownBounds.Contains(x, y))
+            if (_searchFilterOptions.IsClicked)
             {
                 return;
             }
@@ -383,7 +383,7 @@ namespace FashionSense.Framework.UI
             }
 
             // Handle filter
-            if (_searchFilterOptions.bounds.Contains(x, y) || (_searchFilterOptions.IsClicked && _searchFilterOptions.dropDownBounds.Contains(x, y)))
+            if (_searchFilterOptions.bounds.Contains(x, y) || (_searchFilterOptions.IsClicked ))
             {
                 _searchFilterOptions.receiveLeftClick(x, y);
             }
@@ -400,7 +400,7 @@ namespace FashionSense.Framework.UI
             base.leftClickHeld(x, y);
 
             // Handle filter
-            if (_searchFilterOptions.bounds.Contains(x, y) || (_searchFilterOptions.IsClicked && _searchFilterOptions.dropDownBounds.Contains(x, y)))
+            if (_searchFilterOptions.bounds.Contains(x, y) || (_searchFilterOptions.IsClicked ))
             {
                 _searchFilterOptions.leftClickHeld(x, y);
             }
@@ -411,7 +411,7 @@ namespace FashionSense.Framework.UI
             base.releaseLeftClick(x, y);
 
             // Handle filter
-            if (_searchFilterOptions.bounds.Contains(x, y) || _searchFilterOptions.dropDownBounds.Contains(x, y))
+            if (_searchFilterOptions.bounds.Contains(x, y) )
             {
                 _searchFilterOptions.leftClickReleased(x, y);
                 _cachedTextBoxValue = null;

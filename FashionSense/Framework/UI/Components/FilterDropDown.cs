@@ -37,7 +37,7 @@ namespace FashionSense.Framework.UI.Components
             {
                 base.leftClickReleased(x, y);
 
-                if (base.dropDownBounds.Contains(x, y) || (Game1.options.gamepadControls && !Game1.lastCursorMotionWasMouse))
+                if (Game1.options.gamepadControls && !Game1.lastCursorMotionWasMouse)
                 {
                     _ = base.selectedOption;
                 }
@@ -51,9 +51,9 @@ namespace FashionSense.Framework.UI.Components
             IsClicked = false;
         }
 
-        public override void draw(SpriteBatch b, int slotX, int slotY, IClickableMenu context = null)
+        public override void draw(SpriteBatch b, int slotX, int slotY)
         {
-            base.draw(b, slotX, slotY, context);
+            base.draw(b, slotX, slotY);
         }
     }
 }
