@@ -1,7 +1,7 @@
 ﻿{
   "Name": "Fashion Sense",
   "Author": "PeacefulEnd",
-  "Version": "REPLACE_ME_WITH_VERSION",
+  "Version": "7.0.1-android-test",
   "Description": "Framework which adds hair animation and more into Stardew Valley.",
   "UniqueID": "PeacefulEnd.FashionSense",
   "EntryDll": "FashionSense.dll",

@@ -118,6 +118,7 @@ namespace FashionSense
                 new GameLocationPatch(monitor, modHelper).Apply(harmony);
 
                 // Apply UI related patches
+                new AdvancedGameOptionsPatch(monitor, modHelper).Apply(harmony);
                 new CharacterCustomizationPatch(monitor, modHelper).Apply(harmony);
                 new LetterViewerMenuPatch(monitor, modHelper).Apply(harmony);
                 new SaveFileSlotPatch(monitor, modHelper).Apply(harmony);
