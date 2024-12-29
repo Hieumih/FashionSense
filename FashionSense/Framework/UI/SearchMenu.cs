@@ -57,6 +57,11 @@ namespace FashionSense.Framework.UI
             _appearanceFilter = appearanceFilter;
             _callbackMenu = callbackMenu;
 
+            exitFunction = () =>
+            {
+                Game1.activeClickableMenu = _callbackMenu;
+            };
+
             if (Game1.uiViewport.Height >= 720)
             {
                 int adjustedHeight = Game1.uiViewport.Height - 150;
@@ -170,6 +175,7 @@ namespace FashionSense.Framework.UI
                 limitWidth = false,
                 Text = String.Empty
             };
+            
 
             // Establish the search options
             List<string> options = new List<string>() { FashionSense.modHelper.Translation.Get("ui.fashion_sense.search.filter.none"), FashionSense.modHelper.Translation.Get("ui.fashion_sense.search.filter.author"), FashionSense.modHelper.Translation.Get("ui.fashion_sense.search.filter.pack_name"), FashionSense.modHelper.Translation.Get("ui.fashion_sense.search.filter.tags") };
@@ -266,10 +272,10 @@ namespace FashionSense.Framework.UI
                 return;
             }
 
-            if (_searchFilterOptions.IsClicked)
-            {
-                return;
-            }
+            //if (_searchFilterOptions.IsClicked)
+            //{
+            //    return;
+            //}
 
             for (int i = 0; i < availableTextures.Count; i++)
             {
@@ -340,8 +346,19 @@ namespace FashionSense.Framework.UI
         public override void receiveLeftClick(int x, int y, bool playSound = false)
         {
             base.receiveLeftClick(x, y, playSound);
+
+            // if searchBox contain mousepoint, open android keyboard
+            _searchBox.Update();
+
             if (Game1.activeClickableMenu == null)
             {
+                return;
+            }
+
+            // Handle filter
+            if (_searchFilterOptions.IsBoundContain(x, y))
+            {
+                _searchFilterOptions.receiveLeftClick(x, y);    
                 return;
             }
 
@@ -382,28 +399,25 @@ namespace FashionSense.Framework.UI
                 return;
             }
 
-            // Handle filter
-            if (_searchFilterOptions.bounds.Contains(x, y) || (_searchFilterOptions.IsClicked ))
-            {
-                _searchFilterOptions.receiveLeftClick(x, y);
-            }
+
 
             // Handle change direction button
             if (_changeDirectionButton.containsPoint(x, y))
             {
                 ChangeDisplayFarmersDirection();
             }
+
         }
 
         public override void leftClickHeld(int x, int y)
         {
             base.leftClickHeld(x, y);
 
-            // Handle filter
-            if (_searchFilterOptions.bounds.Contains(x, y) || (_searchFilterOptions.IsClicked ))
-            {
-                _searchFilterOptions.leftClickHeld(x, y);
-            }
+            //// Handle filter
+            //if (_searchFilterOptions.bounds.Contains(x, y) || (_searchFilterOptions.IsClicked ))
+            //{
+            //    _searchFilterOptions.leftClickHeld(x, y);
+            //}
         }
 
         public override void releaseLeftClick(int x, int y)
@@ -516,7 +530,14 @@ namespace FashionSense.Framework.UI
             }
 
             Game1.mouseCursorTransparency = 1f;
+            // draw close btn
+            if (upperRightCloseButton != null)
+            {
+                base.upperRightCloseButton.draw(b);
+            }
+
             base.drawMouse(b);
         }
+
     }
 }
