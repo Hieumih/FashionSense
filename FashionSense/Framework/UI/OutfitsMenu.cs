@@ -37,7 +37,7 @@ namespace FashionSense.Framework.UI
         private HandMirrorMenu _callbackMenu;
         private List<List<Outfit>> _pages;
 
-        public OutfitsMenu(HandMirrorMenu callbackMenu) : base(0, 0, 700, 550, showUpperRightCloseButton: false)
+        public OutfitsMenu(HandMirrorMenu callbackMenu) : base(0, 0, 700, 550, showUpperRightCloseButton: true)
         {
             _callbackMenu = callbackMenu;
 
@@ -144,6 +144,7 @@ namespace FashionSense.Framework.UI
             {
                 myID = 99
             };
+
 
             // Handle GamePad integration
             if (Game1.options.snappyMenus && Game1.options.gamepadControls)
@@ -279,6 +280,19 @@ namespace FashionSense.Framework.UI
             if (presetsButton.containsPoint(x, y))
             {
                 PaginatePacks(FashionSense.outfitManager.GetPresetOutfits(), isPreset: true);
+                return;
+            }
+
+            // handle close btn
+            if (upperRightCloseButton.containsPoint(x, y))
+            {
+                if (_isDisplayingPresets)
+                {
+                    PaginatePacks(FashionSense.outfitManager.GetOutfits(Game1.player), isPreset: false);
+                    return;
+                }
+                Game1.activeClickableMenu = _callbackMenu;
+                base.exitThisMenu();
                 return;
             }
 
@@ -609,6 +623,13 @@ namespace FashionSense.Framework.UI
             }
 
             Game1.mouseCursorTransparency = 1f;
+
+            // draw close btn
+            if (upperRightCloseButton != null)
+            {
+                base.upperRightCloseButton.draw(b);
+            }
+
             base.drawMouse(b);
         }
     }

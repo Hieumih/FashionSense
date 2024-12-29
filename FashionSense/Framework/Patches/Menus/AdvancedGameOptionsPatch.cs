@@ -44,6 +44,10 @@ namespace FashionSense.Framework.Patches.Menus
                         Game1.player.modData.Remove(ModDataKeys.STARTS_WITH_HAND_MIRROR);
                         return;
                     }
+                    if (Game1.player.modData.ContainsKey(ModDataKeys.STARTS_WITH_HAND_MIRROR))
+                    {
+                        return;
+                    }
                     Game1.player.modData.Add(ModDataKeys.STARTS_WITH_HAND_MIRROR, true.ToString());
                 });
         }

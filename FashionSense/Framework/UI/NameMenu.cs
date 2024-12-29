@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using FashionSense.Framework.UI.Components;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewValley;
@@ -11,7 +12,7 @@ namespace FashionSense.Framework.UI
     public class NameMenu : IClickableMenu
     {
         private ClickableTextureComponent _doneNamingButton;
-        private TextBox _textBox;
+        private NewTextBox _textBox;
         private TextBoxEvent e;
 
         private const int MIN_LENGTH = 1;
@@ -28,11 +29,12 @@ namespace FashionSense.Framework.UI
             _originalName = originalName;
             _title = title;
 
-            _textBox = new TextBox(null, null, Game1.dialogueFont, Game1.textColor);
+            _textBox = new NewTextBox(null, null, Game1.dialogueFont, Game1.textColor);
             _textBox.Width = Game1.uiViewport.Width / 2;
             _textBox.Height = 192;
             _textBox.X = (Game1.uiViewport.Width / 2) - _textBox.Width / 2;
             _textBox.Y = Game1.uiViewport.Height / 2;
+            _textBox.onShowAndroidKeyBoard += OnAndroidKeyBoardShow;
             e = TextBoxEnter;
             _textBox.OnEnterPressed += e;
             Game1.keyboardDispatcher.Subscriber = _textBox;
@@ -44,6 +46,11 @@ namespace FashionSense.Framework.UI
                 myID = 102,
                 rightNeighborID = 103,
                 leftNeighborID = 104
+            };
+
+            exitFunction = () =>
+            {
+                Game1.activeClickableMenu = _callbackMenu;
             };
 
             EvaluateName();
@@ -168,7 +175,18 @@ namespace FashionSense.Framework.UI
                 IClickableMenu.drawHoverText(b, _hoverText, Game1.smallFont);
             }
 
+            // draw close btn
+            if (upperRightCloseButton != null)
+            {
+                base.upperRightCloseButton.draw(b);
+            }
+
             base.drawMouse(b);
+        }
+
+        public void OnAndroidKeyBoardShow(TextBox sender)
+        {
+            EvaluateName();
         }
     }
 }
